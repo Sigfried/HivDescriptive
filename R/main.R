@@ -108,11 +108,11 @@ execute <- function(connectionDetails,
 	####################### featureExtraction ################################
 	#covariateSettings <- #createDefaultCovariateSettings()
 	covariateSettings <- createCovariateSettings(
-	  # useDemographicsAgeGroup = TRUE
 	  useDemographicsAge = TRUE
-	  , useDemographicsRace = FALSE
-	  , useDemographicsEthnicity = FALSE
-	  , useDemographicsIndexYear = FALSE
+	  , useDemographicsRace = TRUE
+	  , useDemographicsEthnicity = TRUE
+	  , useDemographicsIndexYear = TRUE
+	  ,useDemographicsAgeGroup = TRUE
 	  # useDemographicsIndexMonth = FALSE, useDemographicsPriorObservationTime = FALSE,
 	  # useDemographicsPostObservationTime = FALSE, useDemographicsTimeInCohort = FALSE,
 	  # useDemographicsIndexYearMonth = FALSE, useConditionOccurrenceAnyTimePrior = FALSE,
