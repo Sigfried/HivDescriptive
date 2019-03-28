@@ -96,7 +96,8 @@ execute <- function(connectionDetails,
 										oracleTempSchema = cdmDatabaseSchema,
 										tablePrefix = "",
 										outputFolder,
-										createCohorts = TRUE) {
+										createCohorts = TRUE,
+										cohortTable) {
 	if (!file.exists(outputFolder))
 		dir.create(outputFolder, recursive = TRUE)
 
@@ -105,32 +106,39 @@ execute <- function(connectionDetails,
 	conn <- DatabaseConnector::connect(connectionDetails)
 
 	####################### featureExtraction ################################
-
 	#covariateSettings <- #createDefaultCovariateSettings()
 	covariateSettings <- createCovariateSettings(
-	  useDemographicsAgeGroup = TRUE
-	  # , useConditionOccurrenceAnyTimePrior = TRUE
-	  # , useDemographicsGender = T
-	  # , useCharlsonIndex = T,
+	  # useDemographicsAgeGroup = TRUE
+	  useDemographicsAge = TRUE
+	  , useDemographicsRace = FALSE
+	  , useDemographicsEthnicity = FALSE
+	  , useDemographicsIndexYear = FALSE
+	  # useDemographicsIndexMonth = FALSE, useDemographicsPriorObservationTime = FALSE,
+	  # useDemographicsPostObservationTime = FALSE, useDemographicsTimeInCohort = FALSE,
+	  # useDemographicsIndexYearMonth = FALSE, useConditionOccurrenceAnyTimePrior = FALSE,
+	  # useConditionOccurrenceLongTerm = FALSE, useConditionOccurrenceMediumTerm = FALSE,
+	  # useConditionOccurrenceShortTerm = FALSE, useConditionOccurrencePrimaryInpatientAnyTimePrior = FALSE,
+	  # useConditionOccurrencePrimaryInpatientLongTerm = FALSE,
+	  # useConditionOccurrencePrimaryInpatientMediumTerm = FALSE,
+	  # useConditionOccurrencePrimaryInpatientShortTerm = FALSE,
+	  # useConditionEraAnyTimePrior = FALSE, useConditionEraLongTerm = FALSE,
+	  # useConditionEraMediumTerm = FALSE, useConditionEraShortTerm = FALSE,
+	  # useConditionEraOverlapping = FALSE, useConditionEraStartLongTerm = FALSE,
+	  # useConditionEraStartMediumTerm = FALSE, useConditionEraStartShortTerm = FALSE,
+	  , useConditionOccurrenceAnyTimePrior = TRUE
+	  , useDemographicsGender = TRUE
+	  , useCharlsonIndex = TRUE
 	  # , useChads2Vasc = F,  # this one is causing an error:
 	  , useDcsi = FALSE
 	 )
-	settings2 <- convertPrespecSettingsToDetailedSettings(covariateSettings)
+	#settings2 <- convertPrespecSettingsToDetailedSettings(covariateSettings)
 
 
-	getDbDefaultCovariateData(conn,
+	dcd <- getDbDefaultCovariateData(conn,
 	                          covariateSettings = covariateSettings,
 	                          cdmDatabaseSchema = connp$schema,
 	                          targetDatabaseSchema = connp$results_schema,
 	                          cohortTable = "onek_results.hivteststudy_cohort")
-	querySql(conn, 'SELECT *
-FROM (
-SELECT row_id, covariate_id, covariate_value FROM cov_1 UNION ALL
-SELECT row_id, covariate_id, covariate_value FROM cov_2 UNION ALL
-SELECT row_id, covariate_id, covariate_value FROM cov_3
-) all_covariates;')
-
-
 	# browser()
 	covariateData2 <- getDbCovariateData(
 	                                     # connectionDetails = connectionDetails,
@@ -150,6 +158,17 @@ SELECT row_id, covariate_id, covariate_value FROM cov_3
 	# summary(covariateData2)
 
 	result <- createTable1(covariateData2)
+
+
+	querySql(conn, 'SELECT *
+    FROM (
+    SELECT row_id, covariate_id, covariate_value FROM cov_1 UNION ALL
+    SELECT row_id, covariate_id, covariate_value FROM cov_2 UNION ALL
+    SELECT row_id, covariate_id, covariate_value FROM cov_3
+    ) all_covariates;')
+
+
+
 	#
 	# # not working: (from http://ohdsi.github.io/FeatureExtraction/articles/UsingFeatureExtraction.html#removing-infrequent-covariates-normalizing-and-removing-redundancy)
 	# # (worked after setting aggregated = FALSE above)

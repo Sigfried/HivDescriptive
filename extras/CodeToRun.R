@@ -29,6 +29,7 @@ studyp <- list(
   outputFolder <- getwd(), # Sys.getenv('OUTPUT_FOLDER') # /tmp/study_results
   packageName <- "hivTestStudy"
 )
+studyp$cohort_table = paste0(tablePrefix, "cohort")
 
 connectionDetails <- do.call(
   createConnectionDetails,
@@ -43,7 +44,7 @@ hivTestStudy::init(connectionDetails = connectionDetails,
 
 
 hivTestStudy::execute(connectionDetails = connectionDetails, outputFolder = outputFolder,
-                      connp$results_schema, tablePrefix)
+                      connp$results_schema, tablePrefix, cohortTable = studyp$cohort_table)
 
 
 
