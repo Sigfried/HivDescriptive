@@ -140,7 +140,7 @@ execute <- function(connectionDetails,
 	  , useDemographicsRace = TRUE
 	  , useDemographicsEthnicity = TRUE
 	  , useDemographicsIndexYear = TRUE
-	  ,useDemographicsAgeGroup = TRUE
+	  ,useDemographicsAgeGroup = FALSE
 	  # useDemographicsIndexMonth = FALSE, useDemographicsPriorObservationTime = FALSE,
 	  # useDemographicsPostObservationTime = FALSE, useDemographicsTimeInCohort = FALSE,
 	  # useDemographicsIndexYearMonth = FALSE, useConditionOccurrenceAnyTimePrior = FALSE,
@@ -162,11 +162,11 @@ execute <- function(connectionDetails,
 	#settings2 <- convertPrespecSettingsToDetailedSettings(covariateSettings)
 
 
-	dcd <- getDbDefaultCovariateData(conn,
-	                          covariateSettings = covariateSettings,
-	                          cdmDatabaseSchema = connp$schema,
-	                          targetDatabaseSchema = connp$results_schema,
-	                          cohortTable = "onek_results.HivDescriptive_cohort")
+	# dcd <- getDbDefaultCovariateData(conn,
+	#                           covariateSettings = covariateSettings,
+	#                           cdmDatabaseSchema = connp$schema,
+	#                           targetDatabaseSchema = connp$results_schema,
+	#                           cohortTable = "onek_results.HivDescriptive_cohort")
 	# browser()
 	covariateData2 <- getDbCovariateData(
 	                                     # connectionDetails = connectionDetails,
@@ -175,7 +175,7 @@ execute <- function(connectionDetails,
 	                                     cohortDatabaseSchema = connp$results_schema,
 	                                     cohortTable = cohortTable,
 	                                     cohortId = 1, #target_cohort_id,
-	                                     aggregated = TRUE,
+	                                     aggregated = FALSE,
 	                                     covariateSettings = covariateSettings
 	                                     # covariateSettings = settings2
 	                                     # createTable1 requires aggregated = TRUE
@@ -183,17 +183,20 @@ execute <- function(connectionDetails,
 	   # failing at getDbDefaultCovariateData
 	   # getDbDefaultCovariateData(conn, covariateSettings = covariateSettings, cdmDatabaseSchema = connp$schema, targetDatabaseSchema = connp$results_schema, cohortTable = "onek_results.HivDescriptive_cohort")
 	)
-	# summary(covariateData2)
+	summary(covariateData2)
 
 	result <- createTable1(covariateData2)
 
+	ac <- aggregateCovariates(covariateData2)
+	summary(ac)
+	result <- createTable1(ac)
 
-	querySql(conn, 'SELECT *
-    FROM (
-    SELECT row_id, covariate_id, covariate_value FROM cov_1 UNION ALL
-    SELECT row_id, covariate_id, covariate_value FROM cov_2 UNION ALL
-    SELECT row_id, covariate_id, covariate_value FROM cov_3
-    ) all_covariates;')
+# 	querySql(conn, 'SELECT *
+#     FROM (
+#     SELECT row_id, covariate_id, covariate_value FROM cov_1 UNION ALL
+#     SELECT row_id, covariate_id, covariate_value FROM cov_2 UNION ALL
+#     SELECT row_id, covariate_id, covariate_value FROM cov_3
+#     ) all_covariates;')
 
 
 
