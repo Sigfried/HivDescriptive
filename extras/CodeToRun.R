@@ -43,8 +43,11 @@ HivDescriptive::init(connectionDetails = connectionDetails,
 # use as example now: https://github.com/OHDSI/StudyProtocols/tree/master/KeppraAngioedema
 
 
-HivDescriptive::execute(connectionDetails = connectionDetails, outputFolder = outputFolder,
-                      connp$results_schema, tablePrefix, cohortTable = studyp$cohort_table)
+HivDescriptive::execute(connectionDetails = connectionDetails,
+                        outputFolder = outputFolder,
+                        targetDatabaseSchema = connp$results_schema,
+                        tablePrefix,
+                        cohortTable = studyp$cohort_table)
 
 
 

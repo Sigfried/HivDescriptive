@@ -97,8 +97,8 @@ execute <- function(connectionDetails,
 										tablePrefix = "",
 										outputFolder,
 										createCohorts = TRUE,
-										cohortTable,
-										package = 'HivDescriptive') {
+										cohortTable
+) {
 	if (!file.exists(outputFolder))
 		dir.create(outputFolder, recursive = TRUE)
 
@@ -107,12 +107,14 @@ execute <- function(connectionDetails,
 	conn <- DatabaseConnector::connect(connectionDetails)
 
 	sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "Male50plus.sql",
-	                                         packageName = package,
+	                                         packageName = packageName(),
 	                                         dbms = attr(conn, "dbms"),
 	                                         cohort_database_schema = targetDatabaseSchema,
 	                                         cohort_table = cohortTable)
 
 
+	cat(sql)
+	return()
 
 
 
