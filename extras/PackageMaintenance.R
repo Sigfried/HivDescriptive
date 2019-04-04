@@ -1,6 +1,6 @@
 # Copyright 2018 Observational Health Data Sciences and Informatics
 #
-# This file is part of hivTestStudyCharacterization
+# This file is part of HivDescriptive
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ OhdsiRTools::insertCohortDefinitionInPackage(
 #   insertTableSql = TRUE,
 #   insertCohortCreationR = TRUE,
 #   generateStats = FALSE,
-#   packageName="hivTestStudy")
+#   packageName="HivDescriptive")
   # Inserting cohort: Male50plus
   # Error in readChar(fileName, file.info(fileName)$size) :
   #   invalid 'nchars' argument

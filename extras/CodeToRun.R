@@ -2,7 +2,7 @@ library(DatabaseConnector)
 library(SqlRender)
 library(tidyverse)
 library(FeatureExtraction)
-library(hivTestStudy)
+library(HivDescriptive)
 
 # set your db, server, port, user and password,
 readRenviron('./.env')
@@ -25,9 +25,9 @@ connp <- list(dbms = "postgresql",
 # for params related to this study and package but not to the db connection,
 # use another config variable: studyp:
 studyp <- list(
-  tablePrefix <- "hivTestStudy_",
+  tablePrefix <- "HivDescriptive_",
   outputFolder <- getwd(), # Sys.getenv('OUTPUT_FOLDER') # /tmp/study_results
-  packageName <- "hivTestStudy"
+  packageName <- "HivDescriptive"
 )
 studyp$cohort_table = paste0(tablePrefix, "cohort")
 
@@ -36,14 +36,14 @@ connectionDetails <- do.call(
   connp[c("dbms","server","port","user","password","schema")])
 conn <- connect(connectionDetails)
 
-hivTestStudy::init(connectionDetails = connectionDetails,
+HivDescriptive::init(connectionDetails = connectionDetails,
                    targetDatabaseSchema = connp$results_schema,
                    tablePrefix = studyp$tablePrefix)
 
 # use as example now: https://github.com/OHDSI/StudyProtocols/tree/master/KeppraAngioedema
 
 
-hivTestStudy::execute(connectionDetails = connectionDetails, outputFolder = outputFolder,
+HivDescriptive::execute(connectionDetails = connectionDetails, outputFolder = outputFolder,
                       connp$results_schema, tablePrefix, cohortTable = studyp$cohort_table)
 
 

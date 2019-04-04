@@ -1,13 +1,11 @@
-Package: hivTestStudy
+Package: HivDescriptive
 Type: Package
-Title: hivTestStudy Phenotype Characerization
+Title: HIV Basic Descriptive Study for DRN Use
 Version: 1.0.0
 Author: Sigfried Gold <sigfried@sigfried.org>
   Vojtech Huser <vojtech.huser@nih.gov>
 Maintainer: Sigfried Gold <sigfried@sigfried.org>
-Description: This is the package for the OHDSI study "hivTestStudy Phenotype Characterization Across Observational Health Databases"
-    In this study we want to understand the prevalence of signs and symptoms, treatments, and healthcare utilization patterns 
-  among hivTestStudy patients before diagnosis and relate these patterns to a comparison cohort of ...
+Description: nothing yet...
 Depends:
     DatabaseConnector
 Imports:

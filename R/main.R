@@ -1,6 +1,6 @@
 # Copyright 2018 Observational Health Data Sciences and Informatics
 #
-# This file is part of hivTestStudyCharacterization
+# This file is part of HivDescriptive
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#' Initialize hivTestStudyCharacterization Study Tables
+#' Initialize HivDescriptive Tables
 #'
 #' @details
-#' This function initializes the hivTestStudy Characterization Study tables.
+#' This function initializes the HivDescriptive Study tables.
 #'
 #' @param connectionDetails    An object of type \code{connectionDetails} as created using the
 #'                             \code{\link[DatabaseConnector]{createConnectionDetails}} function in the
@@ -56,10 +56,10 @@ init <- function(connectionDetails, targetDatabaseSchema, tablePrefix="") {
 	invisible(NULL)
 }
 
-#' Execute hivTestStudyCharacterization Study
+#' Execute HivDescriptive Study
 #'
 #' @details
-#' This function executes the hivTestStudy Characterization Study.
+#' This function executes the HivDescriptive Study.
 #'
 #' @param connectionDetails    An object of type \code{connectionDetails} as created using the
 #'                             \code{\link[DatabaseConnector]{createConnectionDetails}} function in the
@@ -97,13 +97,24 @@ execute <- function(connectionDetails,
 										tablePrefix = "",
 										outputFolder,
 										createCohorts = TRUE,
-										cohortTable) {
+										cohortTable,
+										package = 'HivDescriptive') {
 	if (!file.exists(outputFolder))
 		dir.create(outputFolder, recursive = TRUE)
 
 	# OhdsiRTools::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
 
 	conn <- DatabaseConnector::connect(connectionDetails)
+
+	sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "Male50plus.sql",
+	                                         packageName = package,
+	                                         dbms = attr(conn, "dbms"),
+	                                         cohort_database_schema = targetDatabaseSchema,
+	                                         cohort_table = cohortTable)
+
+
+
+
 
 	####################### featureExtraction ################################
 	#covariateSettings <- #createDefaultCovariateSettings()
@@ -138,7 +149,7 @@ execute <- function(connectionDetails,
 	                          covariateSettings = covariateSettings,
 	                          cdmDatabaseSchema = connp$schema,
 	                          targetDatabaseSchema = connp$results_schema,
-	                          cohortTable = "onek_results.hivteststudy_cohort")
+	                          cohortTable = "onek_results.HivDescriptive_cohort")
 	# browser()
 	covariateData2 <- getDbCovariateData(
 	                                     # connectionDetails = connectionDetails,
@@ -153,7 +164,7 @@ execute <- function(connectionDetails,
 	                                     # createTable1 requires aggregated = TRUE
 	                                     # tidyCovariateData requires aggregated = FALSE
 	   # failing at getDbDefaultCovariateData
-	   # getDbDefaultCovariateData(conn, covariateSettings = covariateSettings, cdmDatabaseSchema = connp$schema, targetDatabaseSchema = connp$results_schema, cohortTable = "onek_results.hivteststudy_cohort")
+	   # getDbDefaultCovariateData(conn, covariateSettings = covariateSettings, cdmDatabaseSchema = connp$schema, targetDatabaseSchema = connp$results_schema, cohortTable = "onek_results.HivDescriptive_cohort")
 	)
 	# summary(covariateData2)
 
