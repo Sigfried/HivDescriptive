@@ -129,9 +129,6 @@ execute <- function(connectionDetails,
 
 	print(paste0(cohort_cnt, ' records in ', connp$results_schema, '.', cohortTable))
 
-	return()
-
-
 
 	####################### featureExtraction ################################
 	#covariateSettings <- #createDefaultCovariateSettings()
