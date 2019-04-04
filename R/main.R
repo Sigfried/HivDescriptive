@@ -91,7 +91,7 @@ init <- function(connectionDetails, targetDatabaseSchema, tablePrefix="") {
 #'
 #' @export
 execute <- function(connectionDetails,
-										connp,
+										connp, studyp,
 										tablePrefix = "",
 										outputFolder,
 										createCohorts = TRUE,
@@ -129,6 +129,9 @@ execute <- function(connectionDetails,
 
 	print(paste0(cohort_cnt, ' records in ', connp$results_schema, '.', cohortTable))
 
+	return()
+
+
 
 	####################### featureExtraction ################################
 	#covariateSettings <- #createDefaultCovariateSettings()
@@ -137,7 +140,7 @@ execute <- function(connectionDetails,
 	  , useDemographicsRace = TRUE
 	  , useDemographicsEthnicity = TRUE
 	  , useDemographicsIndexYear = TRUE
-	  ,useDemographicsAgeGroup = FALSE
+	  ,useDemographicsAgeGroup = TRUE
 	  # useDemographicsIndexMonth = FALSE, useDemographicsPriorObservationTime = FALSE,
 	  # useDemographicsPostObservationTime = FALSE, useDemographicsTimeInCohort = FALSE,
 	  # useDemographicsIndexYearMonth = FALSE, useConditionOccurrenceAnyTimePrior = FALSE,
@@ -152,18 +155,26 @@ execute <- function(connectionDetails,
 	  # useConditionEraStartMediumTerm = FALSE, useConditionEraStartShortTerm = FALSE,
 	  , useConditionOccurrenceAnyTimePrior = TRUE
 	  , useDemographicsGender = TRUE
-	  , useCharlsonIndex = TRUE
+	  #, useCharlsonIndex = TRUE
 	  # , useChads2Vasc = F,  # this one is causing an error:
-	  , useDcsi = FALSE
+	  #, useDcsi = FALSE
 	 )
 	#settings2 <- convertPrespecSettingsToDetailedSettings(covariateSettings)
 
 
-	# dcd <- getDbDefaultCovariateData(conn,
-	#                           covariateSettings = covariateSettings,
-	#                           cdmDatabaseSchema = connp$schema,
-	#                           targetDatabaseSchema = connp$results_schema,
-	#                           cohortTable = "onek_results.HivDescriptive_cohort")
+	dcd <- getDbDefaultCovariateData(conn,
+	                          covariateSettings = covariateSettings,
+	                          cdmDatabaseSchema = connp$schema,
+	                          targetDatabaseSchema = connp$results_schema,
+	                          cohortTable = paste0(connp$results_schema, '.', studyp$cohort_table))
+
+	function (connection, oracleTempSchema = NULL, cdmDatabaseSchema,
+	          cohortTable = "#cohort_person", cohortId = -1, cdmVersion = "5",
+	          rowIdField = "subject_id", covariateSettings, targetDatabaseSchema,
+	          targetCovariateTable, targetCovariateRefTable, targetAnalysisRefTable,
+	          aggregated = FALSE)
+
+
 	# browser()
 	covariateData2 <- getDbCovariateData(
 	                                     # connectionDetails = connectionDetails,
@@ -172,7 +183,7 @@ execute <- function(connectionDetails,
 	                                     cohortDatabaseSchema = connp$results_schema,
 	                                     cohortTable = cohortTable,
 	                                     cohortId = 1, #target_cohort_id,
-	                                     aggregated = FALSE,
+	                                     aggregated = TRUE,
 	                                     covariateSettings = covariateSettings
 	                                     # covariateSettings = settings2
 	                                     # createTable1 requires aggregated = TRUE
@@ -180,20 +191,17 @@ execute <- function(connectionDetails,
 	   # failing at getDbDefaultCovariateData
 	   # getDbDefaultCovariateData(conn, covariateSettings = covariateSettings, cdmDatabaseSchema = connp$schema, targetDatabaseSchema = connp$results_schema, cohortTable = "onek_results.HivDescriptive_cohort")
 	)
-	summary(covariateData2)
+	# summary(covariateData2)
 
 	result <- createTable1(covariateData2)
 
-	ac <- aggregateCovariates(covariateData2)
-	summary(ac)
-	result <- createTable1(ac)
 
-# 	querySql(conn, 'SELECT *
-#     FROM (
-#     SELECT row_id, covariate_id, covariate_value FROM cov_1 UNION ALL
-#     SELECT row_id, covariate_id, covariate_value FROM cov_2 UNION ALL
-#     SELECT row_id, covariate_id, covariate_value FROM cov_3
-#     ) all_covariates;')
+	querySql(conn, 'SELECT *
+    FROM (
+    SELECT row_id, covariate_id, covariate_value FROM cov_1 UNION ALL
+    SELECT row_id, covariate_id, covariate_value FROM cov_2 UNION ALL
+    SELECT row_id, covariate_id, covariate_value FROM cov_3
+    ) all_covariates;')
 
 
 
