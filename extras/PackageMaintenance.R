@@ -23,10 +23,6 @@ library(tidyverse)
 readRenviron('.env')
 
 OhdsiRTools::insertCohortDefinitionInPackage(
-  # fileName = "settings.csv",
-  #    cat inst/settings/settings.csv
-  #    "cohortId","atlasId","name","fullName"
-  #    987654321,1769961,"Male50plus","Male > 50"
   definitionId = 1769961,
   name = "Male50plus",
   baseUrl = Sys.getenv("WebAPIBaseUrl"),# "http://18.213.176.21:80/WebAPI"

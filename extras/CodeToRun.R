@@ -19,6 +19,7 @@ connp <- list(dbms = "postgresql",
               user = Sys.getenv('PGUSER'),
               password = Sys.getenv('PGPASSWORD'),
               schema = Sys.getenv('CDM_SCHEMA'),
+              vocab_schema = Sys.getenv('VOCAB_SCHEMA'),
               results_schema = Sys.getenv('RESULTS_SCHEMA')
 )
 
@@ -44,8 +45,8 @@ HivDescriptive::init(connectionDetails = connectionDetails,
 
 
 HivDescriptive::execute(connectionDetails = connectionDetails,
+                        connp = connp,
                         outputFolder = outputFolder,
-                        targetDatabaseSchema = connp$results_schema,
                         tablePrefix,
                         cohortTable = studyp$cohort_table)
 

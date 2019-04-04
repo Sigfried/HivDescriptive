@@ -91,9 +91,7 @@ init <- function(connectionDetails, targetDatabaseSchema, tablePrefix="") {
 #'
 #' @export
 execute <- function(connectionDetails,
-										cdmDatabaseSchema,
-										targetDatabaseSchema,
-										oracleTempSchema = cdmDatabaseSchema,
+										connp,
 										tablePrefix = "",
 										outputFolder,
 										createCohorts = TRUE,
@@ -104,16 +102,33 @@ execute <- function(connectionDetails,
 
 	# OhdsiRTools::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
 
+  dbms <- connp$dbms
+
 	conn <- DatabaseConnector::connect(connectionDetails)
 
 	sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "Male50plus.sql",
+	                                         # Male50plus requires target_cohort_id
+	                                         target_cohort_id = 1,
 	                                         packageName = packageName(),
-	                                         dbms = attr(conn, "dbms"),
-	                                         cohort_database_schema = targetDatabaseSchema,
-	                                         cohort_table = cohortTable)
+	                                         dbms,
+	                                         cdm_database_schema = connp$schema,
+	                                         vocabulary_database_schema = connp$vocab_schema,
+	                                         target_database_schema = connp$results_schema,
+	                                         target_cohort_table = cohortTable)
 
+	DatabaseConnector::executeSql(conn, sql)
 
-	cat(sql)
+	sql <- SqlRender::render(
+	  'SELECT COUNT(*) FROM @target_database_schema.@target_cohort_table',
+	  target_database_schema=connp$results_schema,
+	  target_cohort_table = cohortTable)
+
+	sql <- translate(sql, targetDialect = dbms)
+
+	cohort_cnt <- DatabaseConnector::querySql(conn, sql)
+
+	print(paste0(cohort_cnt, ' records in ', connp$results_schema, '.', cohortTable))
+
 	return()
 
 
