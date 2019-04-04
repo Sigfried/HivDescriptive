@@ -26,11 +26,11 @@ connp <- list(dbms = "postgresql",
 # for params related to this study and package but not to the db connection,
 # use another config variable: studyp:
 studyp <- list(
-  tablePrefix <- "HivDescriptive_",
-  outputFolder <- getwd(), # Sys.getenv('OUTPUT_FOLDER') # /tmp/study_results
-  packageName <- "HivDescriptive"
+  tablePrefix = "HivDescriptive_",
+  outputFolder = getwd(), # Sys.getenv('OUTPUT_FOLDER') # /tmp/study_results
+  packageName = "HivDescriptive"
 )
-studyp$cohort_table = paste0(tablePrefix, "cohort")
+studyp$cohort_table = paste0(studyp$tablePrefix, "cohort")
 
 connectionDetails <- do.call(
   createConnectionDetails,
@@ -46,6 +46,7 @@ HivDescriptive::init(connectionDetails = connectionDetails,
 
 HivDescriptive::execute(connectionDetails = connectionDetails,
                         connp = connp,
+                        studyp = studyp,
                         outputFolder = outputFolder,
                         tablePrefix,
                         cohortTable = studyp$cohort_table)
