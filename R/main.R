@@ -120,7 +120,8 @@ execute <- function(connectionDetails,
 
 	sql <- SqlRender::render(
 	  'SELECT COUNT(*) FROM @target_database_schema.@target_cohort_table',
-	  target_database_schema=connp$results_schema,
+	  #group by cohort_id  
+		target_database_schema=connp$results_schema,
 	  target_cohort_table = cohortTable)
 
 	sql <- translate(sql, targetDialect = dbms)
@@ -131,8 +132,11 @@ execute <- function(connectionDetails,
 
 	return()
 
+#create a a csv file into export folder (with the counts) (pick your design, e.g., one line per cohort
 
-
+	
+	#custom age categories (bin thresholds) #forum to Martijn (vignete may not cover it)
+	
 	####################### featureExtraction ################################
 	#covariateSettings <- #createDefaultCovariateSettings()
 	covariateSettings <- createCovariateSettings(
@@ -193,6 +197,7 @@ execute <- function(connectionDetails,
 	)
 	# summary(covariateData2)
 
+	
 	result <- createTable1(covariateData2)
 
 
