@@ -120,7 +120,8 @@ execute <- function(connectionDetails,
 
 	sql <- SqlRender::render(
 	  'SELECT COUNT(*) FROM @target_database_schema.@target_cohort_table',
-	  target_database_schema=connp$results_schema,
+	  #group by cohort_id
+		target_database_schema=connp$results_schema,
 	  target_cohort_table = cohortTable)
 
 	sql <- translate(sql, targetDialect = dbms)
@@ -128,6 +129,12 @@ execute <- function(connectionDetails,
 	cohort_cnt <- DatabaseConnector::querySql(conn, sql)
 
 	print(paste0(cohort_cnt, ' records in ', connp$results_schema, '.', cohortTable))
+
+
+
+  #create a a csv file into export folder (with the counts) (pick your design, e.g., one line per cohort
+
+	#custom age categories (bin thresholds) #forum to Martijn (vignete may not cover it)
 
 	####################### featureExtraction ################################
 	#covariateSettings <- #createDefaultCovariateSettings()
@@ -188,6 +195,7 @@ execute <- function(connectionDetails,
 	   # getDbDefaultCovariateData(conn, covariateSettings = covariateSettings, cdmDatabaseSchema = connp$schema, targetDatabaseSchema = connp$results_schema, cohortTable = "onek_results.HivDescriptive_cohort")
 	)
 	# summary(covariateData2)
+
 
 	result <- createTable1(covariateData2)
 
