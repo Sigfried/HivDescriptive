@@ -47,8 +47,8 @@ HivDescriptive::init(connectionDetails = connectionDetails,
 HivDescriptive::execute(connectionDetails = connectionDetails,
                         connp = connp,
                         studyp = studyp,
-                        outputFolder = outputFolder,
-                        tablePrefix,
+                        outputFolder = studyp$outputFolder,
+                        studyp$tablePrefix,
                         cohortTable = studyp$cohort_table)
 
 
