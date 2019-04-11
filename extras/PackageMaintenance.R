@@ -14,68 +14,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-# making cohorts the primitive way, not using insertCohortDefinitionSetInPackage
-#   and cohort.csv, etc.
-
-
 library(tidyverse)
 readRenviron('.env')
 
-OhdsiRTools::insertCohortDefinitionInPackage(
-  definitionId = 1769961,
-  name = "Male50plus",
-  baseUrl = Sys.getenv("WebAPIBaseUrl"),# "http://18.213.176.21:80/WebAPI"
-  generateStats = FALSE
-)
-
-
-# add second cohort def at some point
-# cohort 2:
+# add more cohort defs at some point:
 #   HIV patients when HIV onset > age 18
-
-# cohort 3:
-#   patients with HIV lab test
-#   temporarily use any, ldl measure table record
-
-
-
-# don't use settings.csv or cohorts.csv
-#
-# # Generate CSV of cohort names and IDs for the package
-#
-# cohortCsv <-
-#   "cohortId,cohortName,cohortSql
-# 1,Male50plus,Male50plus.sql
-# "
-# #2,ConditionCount,ConditionCount.sql
-#
-# writeLines(cohortCsv, "inst/settings/cohorts.csv")
-
+#   patients with HIV lab test (temporarily use any, ldl measure table record)
 
 # Insert cohort definitions from ATLAS into package -----------------------
+OhdsiRTools::insertCohortDefinitionSetInPackage(fileName = "CohortsToCreate.csv",
+                                                baseUrl = Sys.getenv("WebAPIBaseUrl"),# "http://18.213.176.21:80/WebAPI",
+                                                insertTableSql = TRUE,
+                                                insertCohortCreationR = TRUE,
+                                                generateStats = FALSE,
+                                                packageName = 'HivDescriptive'
+                                                )
+# command above produces error but seems to work. it creates the right files. To do them one by
+#   one without error messages, use commands below
+        # Error in readChar(fileName, file.info(fileName)$size) :
+        #   invalid 'nchars' argument
+        # In addition: Warning message:
+        #   In file(con, "rb") :
+        #   file("") only supports open = "w+" and open = "w+b": using the former
 
-# couldn't get the Set version of insertCohortDefinition<Set>InPackage with
-#      /inst/settings/settings.csv:
-#      "cohortId","atlasId","name","fullName"
-#     987654321,1769961,"Male50plus","Male > 50"
-
-# OhdsiRTools::insertCohortDefinitionSetInPackage(
-#   fileName = "settings.csv",
+# OhdsiRTools::insertCohortDefinitionInPackage(
+#   definitionId = 1769961,
+#   name = "Male50plus",
 #   baseUrl = Sys.getenv("WebAPIBaseUrl"),# "http://18.213.176.21:80/WebAPI"
-#   insertTableSql = TRUE,
-#   insertCohortCreationR = TRUE,
-#   generateStats = FALSE,
-#   packageName="HivDescriptive")
-  # Inserting cohort: Male50plus
-  # Error in readChar(fileName, file.info(fileName)$size) :
-  #   invalid 'nchars' argument
-  # In addition: Warning message:
-  #   In file(con, "rb") :
-  #   file("") only supports open = "w+" and open = "w+b": using the former
-
-# so, don't need settings.csv, and loading from single public ATLAS/WebAPI cohort def:
-
-
-
+#   generateStats = FALSE
+# )
+#
+# OhdsiRTools::insertCohortDefinitionInPackage(
+#   definitionId = 1769440,
+#   name = "HIV patient",
+#   baseUrl = Sys.getenv("WebAPIBaseUrl"),# "http://18.213.176.21:80/WebAPI"
+#   generateStats = FALSE
+# )
 
