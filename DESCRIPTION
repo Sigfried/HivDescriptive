@@ -9,11 +9,28 @@ Description: nothing yet...
 Depends:
     DatabaseConnector
 Imports:
-    SqlRender,
-    OhdsiRTools,
     tidyverse,
-    FeatureExtraction
+    SqlRender,
+    FeatureExtraction,
+    ggplot2,
+    ff,
+    ffbase,
+    OhdsiSharing,
+    zip,
+	  OhdsiRTools (>= 1.5.0)
+FromGithubCom_OHDSI_StudyProtocols_blob_master_AlendronateVsRaloxifene_DESCRIPTION:
+    EmpiricalCalibration,
+    CohortMethod,
+    MethodEvaluation,
+    EvidenceSynthesis,
+    Cyclops
+Suggests:
+    knitr,
+    rmarkdown,
+    DT,
+    shiny
 License: Apache 2.0
 Encoding: UTF-8
-LazyData: true
 RoxygenNote: 6.1.1
+VignetteBuilder: knitr
+LazyData: TRUE

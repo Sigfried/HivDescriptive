@@ -7,6 +7,27 @@ library(HivDescriptive)
 # set your db, server, port, user and password,
 readRenviron('./.env')
 
+# studyp: config var for params related to this study and package but not to the db connection
+studyp <- list(
+  tablePrefix = "HivDescriptive_",
+  outputFolder = getwd(), # Sys.getenv('OUTPUT_FOLDER') # /tmp/study_results
+  packageName = "HivDescriptive"
+)
+studyp$cohort_table = paste0(studyp$tablePrefix, "cohort")
+
+
+# from https://github.com/OHDSI/StudyProtocols/blob/master/AlendronateVsRaloxifene/extras/CodeToRun.R
+remove.packages('HivDescriptive')
+setwd("/export/home/goldss/projects/")
+library(devtools)
+install('HivDescriptive')
+
+library(HivDescriptive)
+
+
+
+
+
 # since connectionDetail doesn't accept more than one schema param
 #   or other params we need later, store those in 'connp'
 # 'connectionDetails' will only be used for  creating connections, not
@@ -23,14 +44,6 @@ connp <- list(dbms = "postgresql",
               results_schema = Sys.getenv('RESULTS_SCHEMA')
 )
 
-# for params related to this study and package but not to the db connection,
-# use another config variable: studyp:
-studyp <- list(
-  tablePrefix = "HivDescriptive_",
-  outputFolder = getwd(), # Sys.getenv('OUTPUT_FOLDER') # /tmp/study_results
-  packageName = "HivDescriptive"
-)
-studyp$cohort_table = paste0(studyp$tablePrefix, "cohort")
 
 connectionDetails <- do.call(
   createConnectionDetails,
@@ -53,3 +66,4 @@ HivDescriptive::execute(connectionDetails = connectionDetails,
 
 
 
+OhdsiRTools::insertEnvironmentSnapshotInPackage(studyp$packageName)

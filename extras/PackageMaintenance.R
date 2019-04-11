@@ -51,3 +51,4 @@ OhdsiRTools::insertCohortDefinitionSetInPackage(fileName = "CohortsToCreate.csv"
 #   generateStats = FALSE
 # )
 
+FeatureExtraction::createAnalysisDetails()
