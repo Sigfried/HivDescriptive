@@ -137,7 +137,11 @@ execute <- function(connectionDetails,
 	#custom age categories (bin thresholds) #forum to Martijn (vignete may not cover it)
 
 	####################### featureExtraction ################################
-	#covariateSettings <- #createDefaultCovariateSettings()
+
+	# new weirdness: createCovariateSettings with params below only results in one covar ()
+
+	covariateSettings <- createDefaultCovariateSettings()
+
 	covariateSettings <- createCovariateSettings(
 	  useDemographicsAge = TRUE
 	  , useDemographicsRace = TRUE
@@ -158,46 +162,55 @@ execute <- function(connectionDetails,
 	  # useConditionEraStartMediumTerm = FALSE, useConditionEraStartShortTerm = FALSE,
 	  , useConditionOccurrenceAnyTimePrior = TRUE
 	  , useDemographicsGender = TRUE
-	  #, useCharlsonIndex = TRUE
+	  , useCharlsonIndex = TRUE
 	  # , useChads2Vasc = F,  # this one is causing an error:
 	  #, useDcsi = FALSE
 	 )
-	#settings2 <- convertPrespecSettingsToDetailedSettings(covariateSettings)
+	settings2 <- convertPrespecSettingsToDetailedSettings(covariateSettings)
 
 
-	dcd <- getDbDefaultCovariateData(conn,
-	                          covariateSettings = covariateSettings,
-	                          cdmDatabaseSchema = connp$schema,
-	                          targetDatabaseSchema = connp$results_schema,
-	                          cohortTable = paste0(connp$results_schema, '.', studyp$cohort_table))
-
-	function (connection, oracleTempSchema = NULL, cdmDatabaseSchema,
-	          cohortTable = "#cohort_person", cohortId = -1, cdmVersion = "5",
-	          rowIdField = "subject_id", covariateSettings, targetDatabaseSchema,
-	          targetCovariateTable, targetCovariateRefTable, targetAnalysisRefTable,
-	          aggregated = FALSE)
+	# dcd <- getDbDefaultCovariateData(conn,
+	#                           covariateSettings = covariateSettings,
+	#                           cdmDatabaseSchema = connp$schema,
+	#                           targetDatabaseSchema = connp$results_schema,
+	#                           cohortTable = paste0(connp$results_schema, '.', studyp$cohort_table))
+	#
+	# function (connection, oracleTempSchema = NULL, cdmDatabaseSchema,
+	#           cohortTable = "#cohort_person", cohortId = -1, cdmVersion = "5",
+	#           rowIdField = "subject_id", covariateSettings, targetDatabaseSchema,
+	#           targetCovariateTable, targetCovariateRefTable, targetAnalysisRefTable,
+	#           aggregated = FALSE)
 
 
 	# browser()
 	covariateData2 <- getDbCovariateData(
-	                                     # connectionDetails = connectionDetails,
-	                                     connection = conn,
+	                                     connectionDetails = connectionDetails,
+	                                     # connection = conn,
 	                                     cdmDatabaseSchema = connp$schema,
 	                                     cohortDatabaseSchema = connp$results_schema,
 	                                     cohortTable = cohortTable,
 	                                     cohortId = 1, #target_cohort_id,
-	                                     aggregated = TRUE,
-	                                     covariateSettings = covariateSettings
-	                                     # covariateSettings = settings2
+	                                     #rowIdField = "subject_id", # sometimes uncommenting this is necessary, but not always
+	                                     # aggregated = TRUE,
+	                                     # covariateSettings = covariateSettings
+	                                     covariateSettings = settings2
 	                                     # createTable1 requires aggregated = TRUE
 	                                     # tidyCovariateData requires aggregated = FALSE
 	   # failing at getDbDefaultCovariateData
 	   # getDbDefaultCovariateData(conn, covariateSettings = covariateSettings, cdmDatabaseSchema = connp$schema, targetDatabaseSchema = connp$results_schema, cohortTable = "onek_results.HivDescriptive_cohort")
 	)
-	# summary(covariateData2)
+	summary(covariateData2)
 
+  # # not working: (from http://ohdsi.github.io/FeatureExtraction/articles/UsingFeatureExtraction.html#removing-infrequent-covariates-normalizing-and-removing-redundancy)
+	# # (worked after setting aggregated = FALSE above)
+	# tcd <- tidyCovariateData(covariateData2, minFraction = 0.01, normalize = T, removeRedundancy = F)
+	#
+	atcd <- aggregateCovariates(covariateData2)
+	result <- createTable1(atcd)
 
 	result <- createTable1(covariateData2)
+
+	result
 
 
 	querySql(conn, 'SELECT *
@@ -209,17 +222,10 @@ execute <- function(connectionDetails,
 
 
 
-	#
-	# # not working: (from http://ohdsi.github.io/FeatureExtraction/articles/UsingFeatureExtraction.html#removing-infrequent-covariates-normalizing-and-removing-redundancy)
-	# # (worked after setting aggregated = FALSE above)
-	# tcd <- tidyCovariateData(covariateData2, minFraction = 0.01, normalize = T, removeRedundancy = F)
-	#
-	# atcd <- aggregateCovariates(tcd)
-	# result <- createTable1(atcd)
-
 	DatabaseConnector::disconnect(conn)
 
 	invisible(NULL)
+	return(result)
 }
   # cut from execute function:
   # if (createCohorts) {
