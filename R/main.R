@@ -97,8 +97,11 @@ execute <- function(connectionDetails,
 										createCohorts = TRUE,
 										cohortTable
 ) {
+  outputFolder <- studyp$outputFolder
 	if (!file.exists(outputFolder))
 		dir.create(outputFolder, recursive = TRUE)
+
+  outputFile <- file(paste0(outputFolder, '/outputLog.txt'))
 
 	# OhdsiRTools::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
 
@@ -131,8 +134,9 @@ execute <- function(connectionDetails,
 
 	cohort_cnt <- DatabaseConnector::querySql(conn, sql)
 
-	print(paste0(cohort_cnt, ' records in ', connp$results_schema, '.', cohortTable))
-
+	msg <- paste0(cohort_cnt, ' records in ', connp$results_schema, '.', cohortTable)
+	writeLines(msg, outputFile)
+	close(outputFile)
 
 
   #create a a csv file into export folder (with the counts) (pick your design, e.g., one line per cohort
