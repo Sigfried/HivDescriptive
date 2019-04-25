@@ -95,7 +95,9 @@ execute <- function(connectionDetails,
 										tablePrefix = "",
 										outputFolder,
 										createCohorts = TRUE,
-										cohortTable
+										cohortTable,
+										runDiagnostics = TRUE,
+										packageResults = FALSE
 ) {
   outputFolder <- studyp$outputFolder
 	if (!file.exists(outputFolder))
@@ -138,6 +140,17 @@ execute <- function(connectionDetails,
 	writeLines(msg, outputFile)
 	close(outputFile)
 
+	if (runDiagnostics) {
+	  OhdsiRTools::logInfo("Running diagnostics")
+	  generateDiagnostics(outputFolder = outputFolder)
+	}
+	if (packageResults) {
+	  OhdsiRTools::logInfo("Packaging results")
+	  packageResults(connectionDetails = connectionDetails,
+	                 cdmDatabaseSchema = cdmDatabaseSchema,
+	                 outputFolder = outputFolder,
+	                 minCellCount = minCellCount)
+	}
 
   #create a a csv file into export folder (with the counts) (pick your design, e.g., one line per cohort
 
