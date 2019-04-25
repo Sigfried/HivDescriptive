@@ -29,13 +29,14 @@ OhdsiRTools::insertCohortDefinitionSetInPackage(fileName = "CohortsToCreate.csv"
                                                 generateStats = FALSE,
                                                 packageName = 'HivDescriptive'
                                                 )
+# Error in readChar(fileName, file.info(fileName)$size) :
+#   invalid 'nchars' argument
+# In addition: Warning message:
+#   In file(con, "rb") :
+#   file("") only supports open = "w+" and open = "w+b": using the former
+
 # command above produces error but seems to work. it creates the right files. To do them one by
 #   one without error messages, use commands below
-        # Error in readChar(fileName, file.info(fileName)$size) :
-        #   invalid 'nchars' argument
-        # In addition: Warning message:
-        #   In file(con, "rb") :
-        #   file("") only supports open = "w+" and open = "w+b": using the former
 
 # OhdsiRTools::insertCohortDefinitionInPackage(
 #   definitionId = 1769961,

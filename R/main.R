@@ -118,6 +118,9 @@ execute <- function(connectionDetails,
 
 	DatabaseConnector::executeSql(conn, sql)
 
+	# WARNING, target_database_schema comes from results_schema, which comes from dotenv file
+	# so if you accidentally get some malicious stuff in .env (which is not part of the repo),
+	# the code here is vulnerable to a sql injection attack
 	sql <- SqlRender::render(
 	  'SELECT COUNT(*) FROM @target_database_schema.@target_cohort_table',
 	  #group by cohort_id

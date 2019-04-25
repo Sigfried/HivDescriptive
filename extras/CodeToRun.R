@@ -2,7 +2,6 @@ library(DatabaseConnector)
 library(SqlRender)
 library(tidyverse)
 library(FeatureExtraction)
-library(HivDescriptive)
 
 # set your db, server, port, user and password,
 readRenviron('./.env')
@@ -10,7 +9,7 @@ readRenviron('./.env')
 # studyp: config var for params related to this study and package but not to the db connection
 studyp <- list(
   tablePrefix = "HivDescriptive_",
-  outputFolder = getwd(), # Sys.getenv('OUTPUT_FOLDER') # /tmp/study_results
+  outputFolder = Sys.getenv('OUTPUT_FOLDER'), # /tmp/study_results
   packageName = "HivDescriptive"
 )
 studyp$cohort_table = paste0(studyp$tablePrefix, "cohort")
@@ -20,10 +19,10 @@ studyp$cohort_table = paste0(studyp$tablePrefix, "cohort")
 remove.packages('HivDescriptive')
 setwd("/export/home/goldss/projects/")
 library(devtools)
-install('HivDescriptive')
+install_local('HivDescriptive')
 
 library(HivDescriptive)
-
+setwd('./HivDescriptive/')
 
 
 
