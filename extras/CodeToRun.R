@@ -18,8 +18,28 @@ studyp <- list(
   outputFolder = outputFolder,
   packageName = "HivDescriptive"
 )
+
 studyp$cohort_table = paste0(studyp$tablePrefix, "hiv_cohort_table")
 cohortTable<-studyp$cohort_table
+
+
+
+HivDescriptive::init(connectionDetails = connectionDetails,
+                     targetDatabaseSchema = connp$results_schema,
+                     tablePrefix = studyp$tablePrefix)
+
+# use as example now: https://github.com/OHDSI/StudyProtocols/tree/master/KeppraAngioedema
+
+
+HivDescriptive::execute(connectionDetails = connectionDetails,
+                        connp = connp,
+                        studyp = studyp,
+                        outputFolder = studyp$outputFolder,
+                        studyp$tablePrefix,
+                        cohortTable = studyp$cohort_table)
+
+
+
 
 
 
