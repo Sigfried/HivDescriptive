@@ -3,6 +3,31 @@ library(SqlRender)
 library(tidyverse)
 library(FeatureExtraction)
 
+
+
+#VH section
+
+cdmDatabaseSchema <- "lhcdatasci"
+cohortDatabaseSchema <- "results"
+cohortTable <- "hiv_descriptive"
+outputFolder <- "c:/temp/study_results"
+
+
+studyp <- list(
+  tablePrefix = "",
+  outputFolder = outputFolder,
+  packageName = "HivDescriptive"
+)
+studyp$cohort_table = paste0(studyp$tablePrefix, "hiv_cohort_table")
+cohortTable<-studyp$cohort_table
+
+
+
+
+
+# old section
+
+
 # set your db, server, port, user and password,
 readRenviron('./.env')
 
