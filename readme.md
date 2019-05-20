@@ -3,10 +3,10 @@
 
 This study aims to study HIV.
 
-Detailed information is available in the [protocol](https://github.com/sigfried/HivDescritive/blob/master/extras/HIV_protocol.docx?raw=true).
+Detailed information is available in the [protocol](https://github.com/Sigfried/HivDescriptive/blob/master/extras/HIV_protocol.docx?raw=true).
 
-Requirements
-============
+## Requirements
+
 
 - A database in [Common Data Model version 5](https://github.com/OHDSI/CommonDataModel) in one of these platforms: SQL Server, Oracle, PostgreSQL, IBM Netezza, Apache Impala, Amazon RedShift, or Microsoft APS.
 - R version 3.4.0 or newer
@@ -16,8 +16,8 @@ Requirements
 
 See [this video](https://youtu.be/K9_0s2Rchbo) for instructions on how to set up the R environment on Windows.
 
-How to run
-==========
+## How to run
+
 1. In `R`, use the following code to install the study package and its dependencies:
 ```r
 	install.packages("devtools")
@@ -31,17 +31,18 @@ How to run
 	install_github("sigfried/HiVDescriptive")
 ```
 
+
 	If you experience problems on Windows where rJava can't find Java, one solution may be to add `args = "--no-multiarch"` to each `install_github` call, for example:
 	
-	```r
+```r
 	install_github("ohdsi/SqlRender", args = "--no-multiarch")
-	```
+```
 	
 	Alternatively, ensure that you have installed both 32-bit and 64-bit JDK versions, as mentioned in the [video tutorial](https://youtu.be/K9_0s2Rchbo).
 	
 2. Once installed, you can execute the study by modifying and using the following code:
 	
-	```r
+```r
 	library(HivDescritive)
 	
 	connectionDetails <- createConnectionDetails(dbms = "postgresql",
@@ -64,7 +65,7 @@ How to run
 				packageResults = TRUE,
 				#maxCores = 30
 				)
-	```
+```
 
 	* For details on how to configure```createConnectionDetails``` in your environment type this for help:
 	```r
