@@ -25,8 +25,8 @@
 packageResults <- function(outputFolder) {
   exportFolder <- file.path(outputFolder, "export")
 
-  if (!file.exists(exportFolder))
-    dir.create(exportFolder)
+  #if (!file.exists(exportFolder))
+  #  dir.create(exportFolder)
 
   ### Add all to zip file ###
   zipName <- file.path(exportFolder, "StudyResults.zip")

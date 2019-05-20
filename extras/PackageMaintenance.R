@@ -14,8 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+#devtools::install_github("OHDSI/OhdsiSharing",args="--no-multiarch" )
+
 library(tidyverse)
-readRenviron('.env')
+#readRenviron('.env')
 
 # add more cohort defs at some point:
 #   HIV patients when HIV onset > age 18
@@ -23,7 +26,7 @@ readRenviron('.env')
 
 # Insert cohort definitions from ATLAS into package -----------------------
 OhdsiRTools::insertCohortDefinitionSetInPackage(fileName = "CohortsToCreate.csv",
-                                                baseUrl = Sys.getenv("WebAPIBaseUrl"),# "http://18.213.176.21:80/WebAPI",
+                                                baseUrl = "http://18.213.176.21:80/WebAPI",
                                                 insertTableSql = TRUE,
                                                 insertCohortCreationR = TRUE,
                                                 generateStats = FALSE,
@@ -52,4 +55,4 @@ OhdsiRTools::insertCohortDefinitionSetInPackage(fileName = "CohortsToCreate.csv"
 #   generateStats = FALSE
 # )
 
-FeatureExtraction::createAnalysisDetails()
+#FeatureExtraction::createAnalysisDetails()
