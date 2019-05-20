@@ -3,7 +3,7 @@
 
 This study aims to study HIV.
 
-Detailed information is available in the [protocol](https://github.com/Sigfried/HivDescritive/blob/master/extras/HIV_protocol.docx?raw=true).
+Detailed information is available in the [protocol](https://github.com/Sigfried/HivDescriptive/blob/master/extras/HIV_protocol.docx?raw=true).
 
 Requirements
 ============
