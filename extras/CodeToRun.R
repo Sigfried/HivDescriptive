@@ -3,30 +3,30 @@ library(SqlRender)
 library(tidyverse)
 library(FeatureExtraction)
 
-
+source('~/secret/conn.R')
 
 #VH section
 
 cdmDatabaseSchema <- "lhcdatasci"
 cohortDatabaseSchema <- "results"
 cohortTable <- "hiv_descriptive"
-outputFolder <- "c:/temp/study_results"
+outputFolder <- "/tmp/study_results" # c:/temp/study_results"
+cohortTable <- "hiv_cohort_table"
 
+# studyp <- list(
+#   tablePrefix = "",
+#   outputFolder = outputFolder,
+#   packageName = "HivDescriptive"
+# )
+# studyp$cohort_table = paste0(studyp$tablePrefix, "hiv_cohort_table")
+# cohortTable<-studyp$cohort_table
 
-studyp <- list(
-  tablePrefix = "",
-  outputFolder = outputFolder,
-  packageName = "HivDescriptive"
-)
-
-studyp$cohort_table = paste0(studyp$tablePrefix, "hiv_cohort_table")
-cohortTable<-studyp$cohort_table
-
-
-
+# Warning: init drops the cohort table and creates an empty one
 HivDescriptive::init(connectionDetails = connectionDetails,
-                     targetDatabaseSchema = connp$results_schema,
-                     tablePrefix = studyp$tablePrefix)
+                     targetDatabaseSchema = cohortDatabaseS_schema)
+
+
+
 
 # use as example now: https://github.com/OHDSI/StudyProtocols/tree/master/KeppraAngioedema
 

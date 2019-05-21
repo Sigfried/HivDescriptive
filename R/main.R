@@ -39,7 +39,7 @@
 #' }
 #'
 #' @export
-init <- function(connectionDetails, targetDatabaseSchema, tablePrefix="") {
+init <- function(connectionDetails, targetDatabaseSchema) {
 
 	conn <- DatabaseConnector::connect(connectionDetails);
 
