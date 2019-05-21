@@ -111,6 +111,9 @@ execute <- function(connectionDetails,
 
 	conn <- DatabaseConnector::connect(connectionDetails)
 
+
+	# make this work on all cohorts in settings file
+	# get martijn's 'createCohorts' R method (.createCohorts?)
 	sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "Male50plus.sql",
 	                                         # Male50plus requires target_cohort_id
 	                                         target_cohort_id = 1,
@@ -126,6 +129,8 @@ execute <- function(connectionDetails,
 	# WARNING, target_database_schema comes from results_schema, which comes from dotenv file
 	# so if you accidentally get some malicious stuff in .env (which is not part of the repo),
 	# the code here is vulnerable to a sql injection attack
+
+	# remember group by!!!
 	sql <- SqlRender::render(
 	  'SELECT COUNT(*) FROM @target_database_schema.@target_cohort_table',
 	  #group by cohort_id
@@ -136,21 +141,14 @@ execute <- function(connectionDetails,
 
 	cohort_cnt <- DatabaseConnector::querySql(conn, sql)
 
-	msg <- paste0(cohort_cnt, ' records in ', connp$results_schema, '.', cohortTable)
-	writeLines(msg, outputFile)
-	close(outputFile)
+	# make csv file with cohort counts, save to output folder
 
-	if (runDiagnostics) {
-	  OhdsiRTools::logInfo("Running diagnostics")
-	  generateDiagnostics(outputFolder = outputFolder)
-	}
-	if (packageResults) {
-	  OhdsiRTools::logInfo("Packaging results")
-	  packageResults(connectionDetails = connectionDetails,
-	                 cdmDatabaseSchema = cdmDatabaseSchema,
-	                 outputFolder = outputFolder,
-	                 minCellCount = minCellCount)
-	}
+	# don't do log
+#
+# 	msg <- paste0(cohort_cnt, ' records in ', connp$results_schema, '.', cohortTable)
+# 	writeLines(msg, outputFile)
+# 	close(outputFile)
+
 
   #create a a csv file into export folder (with the counts) (pick your design, e.g., one line per cohort
 
@@ -231,6 +229,14 @@ execute <- function(connectionDetails,
 	result <- createTable1(covariateData2)
 
 	result
+
+	if (packageResults) {
+	  OhdsiRTools::logInfo("Packaging results")
+	  packageResults(connectionDetails = connectionDetails,
+	                 cdmDatabaseSchema = cdmDatabaseSchema,
+	                 outputFolder = outputFolder,
+	                 minCellCount = minCellCount)
+	}
 
 
 	querySql(conn, 'SELECT *

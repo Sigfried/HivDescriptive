@@ -16,13 +16,13 @@ studyp$cohort_table = paste0(studyp$tablePrefix, "cohort")
 
 
 # from https://github.com/OHDSI/StudyProtocols/blob/master/AlendronateVsRaloxifene/extras/CodeToRun.R
-remove.packages('HivDescriptive')
-setwd("/export/home/goldss/projects/")
-library(devtools)
-install_local('HivDescriptive')
-
-library(HivDescriptive)
-setwd('./HivDescriptive/')
+# remove.packages('HivDescriptive')
+# setwd("/export/home/goldss/projects/")
+# library(devtools)
+# install_local('HivDescriptive')
+#
+# library(HivDescriptive)
+# setwd('./HivDescriptive/')
 
 
 
