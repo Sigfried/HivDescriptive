@@ -14,47 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#' Initialize HivDescriptive Tables
-#'
-#' @details
-#' This function initializes the HivDescriptive Study tables.
-#'
-#' @param connectionDetails    An object of type \code{connectionDetails} as created using the
-#'                             \code{\link[DatabaseConnector]{createConnectionDetails}} function in the
-#'                             DatabaseConnector package.
-#' @param targetDatabaseSchema The schema to contain the study results tables
-#'
-#' @param tablePrefix          A prefix to add to the study tables
-#'
-#' @examples
-#' \dontrun{
-#' connectionDetails <- DatatbaseConnector:: createConnectionDetails(dbms = "postgresql",
-#'                                              user = "joe",
-#'                                              password = "secret",
-#'                                              server = "myserver")
-#'
-#' execute(connectionDetails,
-#'         targetDatabaseSchema = "studyDB.endoStudy",
-#'         tablePrefix="endo_")
-#' }
-#'
-#' @export
-init <- function(connectionDetails, targetDatabaseSchema) {
 
-	conn <- DatabaseConnector::connect(connectionDetails);
-
-	# Create study cohort table structure:
-	sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "CreateCohortTable.sql",
-																					 packageName = packageName(),
-																					 dbms = attr(conn, "dbms"),
-																					 cohort_database_schema = targetDatabaseSchema,
-																					 cohort_table = paste0(tablePrefix, "cohort"))
-
-	DatabaseConnector::executeSql(conn, sql, progressBar = TRUE, reportOverallTime = FALSE)
-	DatabaseConnector::dbDisconnect(conn);
-
-	invisible(NULL)
-}
 
 #' Execute HivDescriptive Study
 #'
