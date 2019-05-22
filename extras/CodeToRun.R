@@ -13,11 +13,6 @@ setwd('./HivDescriptive/')
 
 source('~/secret/conn.R')
 
-connectionDetails <- createConnectionDetails(dbms = dbms,
-                                             user = user,
-                                             password = pw,
-                                             server = server)
-
 #VH section
 cdmDatabaseSchema <- "onek"
 cohortDatabaseSchema <- "onek_results"
@@ -25,6 +20,12 @@ cohortTable <- "hiv_descriptive"
 outputFolder <- "/tmp/study_results" # c:/temp/study_results"
 cohortTable <- "hiv_cohort_table"
 
+connectionDetails <- createConnectionDetails(dbms = dbms,
+                                             user = user,
+                                             password = pw,
+                                             server = server,
+                                             port = port,
+                                             schema = cdmDatabaseSchema)
 
 execute(connectionDetails = connectionDetails,
         cdmDatabaseSchema = cdmDatabaseSchema,
