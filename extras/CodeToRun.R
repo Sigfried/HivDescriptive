@@ -3,13 +3,13 @@ library(SqlRender)
 library(FeatureExtraction)
 
 # from https://github.com/OHDSI/StudyProtocols/blob/master/AlendronateVsRaloxifene/extras/CodeToRun.R
-remove.packages('HivDescriptive')
-setwd("/export/home/goldss/projects/")
-library(devtools)
-install_local('HivDescriptive')
+# remove.packages('HivDescriptive')
+# setwd("/export/home/goldss/projects/")
+# library(devtools)
+# install_local('HivDescriptive')
 
 library(HivDescriptive)
-setwd('./HivDescriptive/')
+#setwd('./HivDescriptive/')
 
 source('~/secret/conn.R')
 
@@ -17,8 +17,8 @@ source('~/secret/conn.R')
 cdmDatabaseSchema <- "onek"
 cohortDatabaseSchema <- "onek_results"
 cohortTable <- "hiv_descriptive"
-outputFolder <- "/tmp/study_results" # c:/temp/study_results"
-cohortTable <- "hiv_cohort_table"
+outputFolder <- "~/temp/study_results" # c:/temp/study_results"
+cohortTable <- "hiv_cohort_table_C"
 
 connectionDetails <- createConnectionDetails(dbms = dbms,
                                              user = user,
@@ -27,15 +27,30 @@ connectionDetails <- createConnectionDetails(dbms = dbms,
                                              port = port,
                                              schema = cdmDatabaseSchema)
 
+#convention   resultSchema = cohortDatabaseSchema = workSchema)
+
 execute(connectionDetails = connectionDetails,
         cdmDatabaseSchema = cdmDatabaseSchema,
         cohortDatabaseSchema = cohortDatabaseSchema,
         cohortTable = cohortTable,
         oracleTempSchema = NULL,
-        outputFolder = outputfolder,
+        outputFolder = outputFolder,
         createCohorts = TRUE,
         packageResults = TRUE
 )
+
+
+
+#VH troubleshooting
+oracleTempSchema = NULL
+#disconnect(connection)
+connection <- DatabaseConnector::connect(connectionDetails)
+
+DatabaseConnector::getTableNames(connection,databaseSchema = cdmDatabaseSchema)
+
+DatabaseConnector::getTableNames(connection,databaseSchema = cohortDatabaseSchema)
+
+
 
 
 # studyp <- list(

@@ -59,7 +59,7 @@ execute <- function(connectionDetails,
                     outputFolder,
                     packageResults = TRUE) {
   #1. prepare folder, and create cohorts
-  outputFolder <- studyp$outputFolder
+  #outputFolder <- studyp$outputFolder
 	if (!file.exists(outputFolder))
 		dir.create(outputFolder, recursive = TRUE)
 
@@ -82,15 +82,15 @@ execute <- function(connectionDetails,
   #
   # DatabaseConnector::executeSql(conn, sql)
   if (createCohorts) {
-    createCohorts(connection = connectionDetails,
+    createCohorts(connection = conn,
                   cdmDatabaseSchema = cdmDatabaseSchema,
                   cohortDatabaseSchema = cohortDatabaseSchema,
                   cohortTable = cohortTable,
                   oracleTempSchema = NULL,
-                  outputFolder = outputfolder)
+                  outputFolder = outputFolder)
   }
   print("ran createCohorts")
-  return()
+  #return()
 
   #consider removing this later
   outputFile <- file(paste0(outputFolder, '/outputLog.txt'))
@@ -114,7 +114,7 @@ execute <- function(connectionDetails,
 	#since we are in execute, we don't have the cohortToCreate object so commenting it out
 	# counts <- merge(counts, data.frame(cohortDefinitionId = cohortsToCreate$cohortId,
 	#                                    cohortName  = cohortsToCreate$name))
-	write.csv(counts, file.path(exportFolder, "CohortCounts.csv"))
+	write.csv(counts, file.path(exportFolder, "CohortCounts.csv"),row.names = FALSE)
 
 
 	if (packageResults) {
