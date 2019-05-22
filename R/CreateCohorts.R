@@ -46,7 +46,7 @@
 #' }
 #'
 #' @export
-.createCohorts <- function(connection,
+createCohorts <- function(connection,
                            cdmDatabaseSchema,
                            vocabularyDatabaseSchema = cdmDatabaseSchema,
                            cohortDatabaseSchema,

@@ -51,50 +51,53 @@
 #'
 #' @export
 execute <- function(connectionDetails,
-										connp, studyp, #p prefix is making it complex
-										tablePrefix = "", #better eliminate
-										outputFolder,
-										createCohorts = TRUE,
-										cohortTable = 'hiv_cohort',  #consider removing the prefixes for cohort table
-										runDiagnostics = TRUE,
-										packageResults = FALSE
-) {
+                    cdmDatabaseSchema,
+                    cohortDatabaseSchema,
+                    createCohorts = TRUE,
+                    cohortTable = 'hiv_cohort',  #consider removing the prefixes for cohort table
+                    oracleTempSchema = NULL,
+                    outputFolder,
+                    packageResults = TRUE) {
   #1. prepare folder, and create cohorts
   outputFolder <- studyp$outputFolder
 	if (!file.exists(outputFolder))
 		dir.create(outputFolder, recursive = TRUE)
 
   #create export folder
-
   exportFolder <- file.path(outputFolder, "export")
   if (!file.exists(exportFolder))
     dir.create(exportFolder)
 
+  conn <- DatabaseConnector::connect(connectionDetails)
+  #TODO create all the cohorts here
+  # sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "Male50plus.sql",
+  #                                          # Male50plus requires target_cohort_id
+  #                                          target_cohort_id = 1,
+  #                                          packageName = packageName(),
+  #                                          dbms,
+  #                                          cdm_database_schema = connp$schema,
+  #                                          vocabulary_database_schema = connp$vocab_schema,
+  #                                          target_database_schema = connp$results_schema,
+  #                                          target_cohort_table = cohortTable)
+  #
+  # DatabaseConnector::executeSql(conn, sql)
+  if (createCohorts) {
+    createCohorts(connection = connectionDetails,
+                  cdmDatabaseSchema = cdmDatabaseSchema,
+                  cohortDatabaseSchema = cohortDatabaseSchema,
+                  cohortTable = cohortTable,
+                  oracleTempSchema = NULL,
+                  outputFolder = outputfolder)
+  }
+  print("ran createCohorts")
+  return()
 
-
-#consider removing this later
+  #consider removing this later
   outputFile <- file(paste0(outputFolder, '/outputLog.txt'))
 
 	# OhdsiRTools::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
 
-  dbms <- connp$dbms
-
-	conn <- DatabaseConnector::connect(connectionDetails)
-
-	#TODO create all the cohorts here
-	sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "Male50plus.sql",
-	                                         # Male50plus requires target_cohort_id
-	                                         target_cohort_id = 1,
-	                                         packageName = packageName(),
-	                                         dbms,
-	                                         cdm_database_schema = connp$schema,
-	                                         vocabulary_database_schema = connp$vocab_schema,
-	                                         target_database_schema = connp$results_schema,
-	                                         target_cohort_table = cohortTable)
-
-	DatabaseConnector::executeSql(conn, sql)
-
-#2. count it with group by
+  #2. count it with group by
 	# Fetch cohort counts:
 	sql <- "SELECT cohort_definition_id, COUNT(*) AS count FROM @cohort_database_schema.@cohort_table GROUP BY cohort_definition_id"
   #	'SELECT COUNT(*) FROM @target_database_schema.@target_cohort_table',

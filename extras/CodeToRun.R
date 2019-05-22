@@ -1,17 +1,41 @@
 library(DatabaseConnector)
 library(SqlRender)
-library(tidyverse)
 library(FeatureExtraction)
+
+# from https://github.com/OHDSI/StudyProtocols/blob/master/AlendronateVsRaloxifene/extras/CodeToRun.R
+remove.packages('HivDescriptive')
+setwd("/export/home/goldss/projects/")
+library(devtools)
+install_local('HivDescriptive')
+
+library(HivDescriptive)
+setwd('./HivDescriptive/')
 
 source('~/secret/conn.R')
 
-#VH section
+connectionDetails <- createConnectionDetails(dbms = dbms,
+                                             user = user,
+                                             password = pw,
+                                             server = server)
 
-cdmDatabaseSchema <- "lhcdatasci"
-cohortDatabaseSchema <- "results"
+#VH section
+cdmDatabaseSchema <- "onek"
+cohortDatabaseSchema <- "onek_results"
 cohortTable <- "hiv_descriptive"
 outputFolder <- "/tmp/study_results" # c:/temp/study_results"
 cohortTable <- "hiv_cohort_table"
+
+
+execute(connectionDetails = connectionDetails,
+        cdmDatabaseSchema = cdmDatabaseSchema,
+        cohortDatabaseSchema = cohortDatabaseSchema,
+        cohortTable = cohortTable,
+        oracleTempSchema = NULL,
+        outputFolder = outputfolder,
+        createCohorts = TRUE,
+        packageResults = TRUE
+)
+
 
 # studyp <- list(
 #   tablePrefix = "",
@@ -60,14 +84,6 @@ studyp <- list(
 studyp$cohort_table = paste0(studyp$tablePrefix, "cohort")
 
 
-# from https://github.com/OHDSI/StudyProtocols/blob/master/AlendronateVsRaloxifene/extras/CodeToRun.R
-# remove.packages('HivDescriptive')
-# setwd("/export/home/goldss/projects/")
-# library(devtools)
-# install_local('HivDescriptive')
-#
-# library(HivDescriptive)
-# setwd('./HivDescriptive/')
 
 
 
