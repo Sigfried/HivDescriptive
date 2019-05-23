@@ -14,8 +14,12 @@ library(HivDescriptive)
 source('~/secret/conn.R')
 
 #VH section
+
 cdmDatabaseSchema <- "onek"
 cohortDatabaseSchema <- "onek_results"
+#cdmDatabaseSchema <- "mimic2omop"
+#cohortDatabaseSchema <- "mimic2omop_results"
+
 cohortTable <- "hiv_descriptive"
 outputFolder <- "~/temp/study_results" # c:/temp/study_results"
 cohortTable <- "hiv_cohort_table_C"

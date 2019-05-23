@@ -17,9 +17,6 @@
 
 #devtools::install_github("OHDSI/OhdsiSharing",args="--no-multiarch" )
 
-library(tidyverse)
-#readRenviron('.env')
-
 # add more cohort defs at some point:
 #   HIV patients when HIV onset > age 18
 #   patients with HIV lab test (temporarily use any, ldl measure table record)
