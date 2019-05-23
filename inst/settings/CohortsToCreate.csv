@@ -1,6 +1,7 @@
 cohortId,atlasId,name
 1769961,1769961,Male50plus
 1769440,1769440,HIV_Patient
+1770612,1770612,HIV patient by LOINC codes
 99321,99321,Alendronate
 99322,99322,Raloxifene
 99323,99323,HipFracture

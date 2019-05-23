@@ -93,7 +93,7 @@ createCohorts <- function(connection,
   names(counts) <- SqlRender::snakeCaseToCamelCase(names(counts))
   counts <- merge(counts, data.frame(cohortDefinitionId = cohortsToCreate$cohortId,
                                      cohortName  = cohortsToCreate$name))
-  write.csv(counts, file.path(outputFolder, "CohortCounts.csv"))
+  write.csv(counts, file.path(outputFolder, "CohortCounts.csv"), row.names = FALSE)
   writeLines(paste0("Wrote cohort counts to ", outputFolder,"/CohortCounts.csv"))
 }
 
