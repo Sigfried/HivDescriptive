@@ -87,7 +87,9 @@ execute <- function(connectionDetails,
                   cohortDatabaseSchema = cohortDatabaseSchema,
                   cohortTable = cohortTable,
                   oracleTempSchema = NULL,
-                  outputFolder = outputFolder)
+                  # outputFolder = outputFolder, # should cohort counts end up in export? assuming so for now:
+                  outputFolder = exportFolder
+    )
   }
   print("ran createCohorts")
   #return()
