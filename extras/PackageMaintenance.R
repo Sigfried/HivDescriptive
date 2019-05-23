@@ -25,7 +25,7 @@
 OhdsiRTools::insertCohortDefinitionSetInPackage(fileName = "CohortsToCreate.csv",
                                                 baseUrl = "http://18.213.176.21:80/WebAPI",
                                                 insertTableSql = TRUE,
-                                                insertCohortCreationR = TRUE,
+                                                insertCohortCreationR = FALSE, #TRUE,
                                                 generateStats = FALSE,
                                                 packageName = 'HivDescriptive'
                                                 )
