@@ -97,32 +97,11 @@ execute <- function(connectionDetails,
 
 	# OhdsiRTools::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
 
-  #2. count it with group by
-	# Fetch cohort counts:
-	sql <- "SELECT cohort_definition_id, COUNT(*) AS count FROM @cohort_database_schema.@cohort_table GROUP BY cohort_definition_id"
-  #	'SELECT COUNT(*) FROM @target_database_schema.@target_cohort_table',
-	# target_database_schema=connp$results_schema,
-	# target_cohort_table = cohortTable)
-  sql <- SqlRender::renderSql(sql,
-	                            cohort_database_schema = connp$results_schema,
-	                            cohort_table = cohortTable)$sql
-	sql <- SqlRender::translateSql(sql, targetDialect = attr(connection, "dbms"))$sql
-	counts <- DatabaseConnector::querySql(connection, sql)
-	#trying to stick the the style of OHDSI
-	names(counts) <- SqlRender::snakeCaseToCamelCase(names(counts))
-
-	#since we are in execute, we don't have the cohortToCreate object so commenting it out
-	# counts <- merge(counts, data.frame(cohortDefinitionId = cohortsToCreate$cohortId,
-	#                                    cohortName  = cohortsToCreate$name))
-	write.csv(counts, file.path(exportFolder, "CohortCounts.csv"),row.names = FALSE)
-
+  # SG, 5/23/2019: removed cohort count query; already being done in CreateCohorts.R
 
 	if (packageResults) {
 	  #OhdsiRTools::logInfo("Packaging results")
-	 packageResults(connectionDetails = connectionDetails,
-	                 cdmDatabaseSchema = cdmDatabaseSchema,
-	                 outputFolder = outputFolder,
-	                 minCellCount = minCellCount)
+	 packageResults(outputFolder = outputFolder)
 	}
 
 #   #create a a csv file into export folder (with the counts) (pick your design, e.g., one line per cohort
@@ -217,7 +196,8 @@ execute <- function(connectionDetails,
 	DatabaseConnector::disconnect(conn)
 
 	invisible(NULL)
-	return(result)
+	# return(result) # commented out code above creates results. returning nothing for now
+	return()
 }
   # cut from execute function:
   # if (createCohorts) {
