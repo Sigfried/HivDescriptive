@@ -9,7 +9,6 @@ Description: nothing yet...
 Depends:
     DatabaseConnector
 Imports:
-    tidyverse,
     SqlRender,
     FeatureExtraction,
     ggplot2,

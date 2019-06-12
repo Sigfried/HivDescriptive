@@ -39,7 +39,7 @@
 # 1769043,1769043,AcuteStroke%
 
 # things start breaking in CreateCohorts when this one is added:
-# 1770614,1770614,HIV_by_1_SNOMED_Dx
+# 1770614,1770614,HIV_by_1_SNOMED_Dx    # SG, 6/12/2019: this isn't breaking things anymore. not sure why
 
 # Insert cohort definitions from ATLAS into package -----------------------
 OhdsiRTools::insertCohortDefinitionSetInPackage(fileName = "CohortsToCreate.csv",
