@@ -86,15 +86,11 @@ execute(connectionDetails = connectionDetails,
 	
 
 
-3. Email the file (or use the uplaod)  ```export/studyResult.zip``` in the output folder to the study coordinator:
-```r
-submitResults("c:/temp/study_results/export", key = "<key>", secret = "<secret>")
-```
-Where ```key``` and ```secret``` are the credentials provided to you personally by the study coordinator.
+3. Email the file   ```export/studyResult.zip``` in the output folder to the study coordinator (Sigfried Gold) (encryption or password protection is not necessary since extracted data is on aggregated level only) :
 
 ## Getting Involved
 
-* Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers">OHDSI Forum</a>
+* Developer questions/comments/feedback: http://forums.ohdsi.org/t/hiv-research-in-the-cdm/6789
 * We use the <a href="../../issues">GitHub issue tracker</a> for all bugs/issues/enhancements
 
 
@@ -104,5 +100,4 @@ Package  was developed in R Studio.
 
 ### Development status
 
-In development and testing.
-In production. We're running this study at multiple sites.
+In production. Version 1 with simple output is being piloted at 2 initial sites.
