@@ -16,9 +16,9 @@ source('~/secret/conn.R')
 #VH section
 
 cdmDatabaseSchema <- "onek"
-cohortDatabaseSchema <- "onek_results"
-#cdmDatabaseSchema <- "mimic2omop"
-#cohortDatabaseSchema <- "mimic2omop_results"
+resultsDatabaseSchema <- cohortDatabaseSchema <- "onek_results"
+# cdmDatabaseSchema <- "mimic2omop"
+# cohortDatabaseSchema <- "mimic2omop_results"
 
 cohortTable <- "hiv_descriptive"
 outputFolder <- "~/temp/study_results" # c:/temp/study_results"
@@ -62,7 +62,26 @@ HivDescriptive::execute(connectionDetails = connectionDetails,
 
 
 
-#VH troubleshooting
+covariateSettings <- createDefaultCovariateSettings()
+
+covariateData <- getDbCovariateData(connectionDetails = connectionDetails,
+                                    cdmDatabaseSchema = cdmDatabaseSchema,
+                                    cohortDatabaseSchema = resultsDatabaseSchema,
+                                    cohortTable = cohortTable,
+                                    cohortId = 1769961,
+                                    rowIdField = "subject_id",
+                                    covariateSettings = covariateSettings)
+covariateData2 <- aggregateCovariates(covariateData)
+
+# summary(covariateData)
+# covariateData$covariates
+# saveCovariateData(covariateData, "covariates")
+
+
+result <- createTable1(covariateData2)
+print(result, row.names = FALSE, right = FALSE)
+
+# VH troubleshooting
 # oracleTempSchema = NULL
 # #disconnect(connection)
 # connection <- DatabaseConnector::connect(connectionDetails)
