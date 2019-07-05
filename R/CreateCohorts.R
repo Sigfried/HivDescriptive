@@ -47,12 +47,13 @@
 #'
 #' @export
 createCohorts <- function(connection,
-                           cdmDatabaseSchema,
-                           vocabularyDatabaseSchema = cdmDatabaseSchema,
-                           cohortDatabaseSchema,
-                           cohortTable,
-                           oracleTempSchema,
-                           outputFolder) {
+                          cohortsToCreate = cohortsToCreate,
+                          cdmDatabaseSchema,
+                          vocabularyDatabaseSchema = cdmDatabaseSchema,
+                          cohortDatabaseSchema,
+                          cohortTable,
+                          oracleTempSchema,
+                          outputFolder) {
 
   # Create study cohort table structure:
   sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "CreateCohortTable.sql",
@@ -63,11 +64,7 @@ createCohorts <- function(connection,
                                            cohort_table = cohortTable)
   DatabaseConnector::executeSql(connection = connection, sql = sql, progressBar = FALSE, reportOverallTime = FALSE)
 
-
-
   # Instantiate cohorts:
-  pathToCsv <- system.file("settings", "CohortsToCreate.csv", package = "HivDescriptive")
-  cohortsToCreate <- read.csv(pathToCsv)
   for (i in 1:nrow(cohortsToCreate)) {
     writeLines(paste("Creating cohort:", cohortsToCreate$name[i]))
     sql <- SqlRender::loadRenderTranslateSql(sqlFilename = paste0(cohortsToCreate$name[i], ".sql"),
