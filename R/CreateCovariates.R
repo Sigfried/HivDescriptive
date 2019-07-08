@@ -30,26 +30,21 @@ createCovariates <- function(connection,
                              cohortDatabaseSchema,
                              cohortTable,
                              oracleTempSchema,
-                             outputFolder) {
+                             exportFolder) {
   # copied code from vignette: https://raw.githubusercontent.com/OHDSI/FeatureExtraction/master/inst/doc/CreatingCovariatesUsingCohortAttributes.pdf
 
-  sql <- SqlRender::loadRenderTranslateSql(
-    "LengthOfObsCohortAttr.sql",
-    packageName = "HivDescriptive",
-    dbms = attr(connection, "dbms"),
-    cdm_database_schema = cdmDatabaseSchema,
-    cohort_database_schema = cohortDatabaseSchema,
-    cohort_table = "hiv_cohort_table",
-    cohort_attribute_table = "loo_cohort_attr",
-    attribute_definition_table = "loo_attr_def",
-    cohort_definition_ids = cohorts$cohortId)
-
-  cat(sql)
-  browser()
-
-  executeSql(connection, sql)
-
-
+  # sql <- SqlRender::loadRenderTranslateSql(
+  #   "LengthOfObsCohortAttr.sql",
+  #   packageName = "HivDescriptive",
+  #   dbms = attr(connection, "dbms"),
+  #   cdm_database_schema = cdmDatabaseSchema,
+  #   cohort_database_schema = cohortDatabaseSchema,
+  #   cohort_table = "hiv_cohort_table",
+  #   cohort_attribute_table = "loo_cohort_attr",
+  #   attribute_definition_table = "loo_attr_def",
+  #   cohort_definition_ids = cohorts$cohortId)
+  # cat(sql)
+  # executeSql(connection, sql)
   covariateSettings <- createCovariateSettings(useDemographicsGender = TRUE,
                                                useDemographicsAgeGroup = TRUE,
                                                useDemographicsRace = TRUE,
@@ -60,19 +55,78 @@ createCovariates <- function(connection,
                                                useMeasurementAnyTimePrior = TRUE
   )
 
-  looCovSet <- createCohortAttrCovariateSettings(attrDatabaseSchema = cohortDatabaseSchema,
-                                                 cohortAttrTable = "loo_cohort_attr",
-                                                 attrDefinitionTable = "loo_attr_def")
+  # looCovSet <- createCohortAttrCovariateSettings(attrDatabaseSchema = cohortDatabaseSchema,
+  #                                                cohortAttrTable = "loo_cohort_attr",
+  #                                                attrDefinitionTable = "loo_attr_def")
+  #
+  # covariateSettingsList <- list(covariateSettings, looCovSet)
+  # browser()
 
-  covariateSettingsList <- list(covariateSettings, looCovSet)
+  # result = NULL
+  for (i in 1:nrow(cohorts)) {
+    writeLines(paste("Creating covariates for cohort", cohorts$name[i]))
+    covariates <- getDbCovariateData(connection = connection,
+                                     cdmDatabaseSchema = cdmDatabaseSchema,
+                                     cohortDatabaseSchema = cohortDatabaseSchema,
+                                     cohortTable = "hiv_cohort_table",
+                                     cohortId = cohorts$cohortId[i],
+                                     # covariateSettings = covariateSettingsList
+                                     covariateSettings = covariateSettings
+    )
+    # browser()
 
-  covariates <- getDbCovariateData(connection = connection,
-                                   cdmDatabaseSchema = cdmDatabaseSchema,
-                                   cohortDatabaseSchema = resultsDatabaseSchema,
-                                   cohortTable = "hiv_cohort_table",
-                                   # cohortId = 1769961,
-                                   covariateSettings = covariateSettingsList)
-  return(covariates)
+    if (covariates$metaData$populationSize) {
+      aggcovariates <- aggregateCovariates(covariates)
+
+      # result <- createTable1(aggcovariates,
+      #                        specifications = getDefaultTable1Specifications(),
+      #                        output = "one column")
+
+      cresult <-
+        mrg(
+          mrg(
+            mrg(
+              mrg(data.frame(cohorts[1:2, i]),
+                  aggcovariates$covariateRef),
+              aggcovariates$analysisRef),
+            aggcovariates$covariates),
+          aggcovariates$covariatesContinuous)
+
+      cresult$cohortId <- cohorts$cohortId[[i]]
+      cresult$cohortName <- toString(cohorts$name[[i]])
+
+      # browser()
+
+      fname <- paste0(cohorts$name[[i]], "-covariates.csv")
+      writeLines(paste0("Writing covariates to ", exportFolder,"/", fname))
+      write.csv(cresult, file.path(exportFolder, fname), row.names = FALSE)
+
+      # if( is.null(result)) {
+      #   result <- cresult
+      # } else {
+      #   if (ncol(result) != ncol(cresult)) {
+      #     browser()
+      #   }
+      #   result <- rbind(result, cresult)
+      # }
+    } else{
+      writeLines(paste0('0 population in ', cohorts$name[[i]]))
+    }
+  }
+}
+# return(result)
+    # # Fetch cohort counts:
+    # sql <- "SELECT cohort_definition_id, COUNT(*) AS count FROM @cohort_database_schema.@cohort_table GROUP BY cohort_definition_id"
+    # sql <- SqlRender::render(sql,
+    #                          cohort_database_schema = cohortDatabaseSchema,
+    #                          cohort_table = cohortTable)
+    # sql <- SqlRender::translate(sql, targetDialect = attr(connection, "dbms"))
+    # counts <- DatabaseConnector::querySql(connection, sql)
+    # names(counts) <- SqlRender::snakeCaseToCamelCase(names(counts))
+    # counts <- merge(counts, data.frame(cohortDefinitionId = cohortsToCreate$cohortId,
+    #                                    cohortName  = cohortsToCreate$name))
+    # write.csv(counts, file.path(outputFolder, "CohortCounts.csv"), row.names = FALSE)
+    # writeLines(paste0("Wrote cohort counts to ", outputFolder,"/CohortCounts.csv"))
 
   #
   # covariateSettings <- createDefaultCovariateSettings()
@@ -98,40 +152,8 @@ createCovariates <- function(connection,
   #
   # result <- createTable1(covariateData2)
   # print(result, row.names = FALSE, right = FALSE)
-  #
-  # result <- createTable1(covariateData2, specifications = getDefaultTable1Specifications()[1:5,])
-  #
-  # for (i in 1:nrow(cohorts)) {
-  #   writeLines(paste("Creating covariates for cohort", cohortsToCreate$name[i]))
-  #   sql <- SqlRender::loadRenderTranslateSql(sqlFilename = paste0(cohorts$name[i], ".sql"),
-  #                                            packageName = "HivDescriptive",
-  #                                            dbms = attr(connection, "dbms"),
-  #                                            oracleTempSchema = oracleTempSchema,
-  #                                            cdm_database_schema = cdmDatabaseSchema,
-  #                                            vocabulary_database_schema = vocabularyDatabaseSchema,
-  #
-  #                                            target_database_schema = cohortDatabaseSchema,
-  #                                            target_cohort_table = cohortTable,
-  #                                            target_cohort_id = cohorts$cohortId[i])
-  #   DatabaseConnector::executeSql(connection, sql)
-  # }
 
-
-
-
-  # Instantiate cohorts:
-
-  # Fetch cohort counts:
-  # sql <- "SELECT cohort_definition_id, COUNT(*) AS count FROM @cohort_database_schema.@cohort_table GROUP BY cohort_definition_id"
-  # sql <- SqlRender::render(sql,
-  #                          cohort_database_schema = cohortDatabaseSchema,
-  #                          cohort_table = cohortTable)
-  # sql <- SqlRender::translate(sql, targetDialect = attr(connection, "dbms"))
-  # counts <- DatabaseConnector::querySql(connection, sql)
-  # names(counts) <- SqlRender::snakeCaseToCamelCase(names(counts))
-  # counts <- merge(counts, data.frame(cohortDefinitionId = cohortsToCreate$cohortId,
-  #                                    cohortName  = cohortsToCreate$name))
-  # write.csv(counts, file.path(outputFolder, "CohortCounts.csv"), row.names = FALSE)
-  # writeLines(paste0("Wrote cohort counts to ", outputFolder,"/CohortCounts.csv"))
+mrg <- function(df1, df2) {
+  return(merge(ff::as.ram(df1), ff::as.ram(df2), all = T))
 }
 

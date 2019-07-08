@@ -100,8 +100,9 @@ execute <- function(connectionDetails,
                      cohortTable = cohortTable,
                      oracleTempSchema = NULL,
                      # outputFolder = outputFolder, # should cohort counts end up in export? assuming so for now:
-                     outputFolder = exportFolder
+                     exportFolder = exportFolder
     )
+
     print("ran createCovariates")
     if (return == "covariates") {
       return(covariates)

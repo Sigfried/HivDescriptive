@@ -7,38 +7,43 @@ library(FeatureExtraction)
 # library(devtools)
 # install_local('HivDescriptive')
 library(HivDescriptive)
-#setwd('./HivDescriptive/')
-source('~/secret/conn.R')
 
-cdm_database_schema <- cdmDatabaseSchema <- "onek"
-resultsDatabaseSchema <- cohortDatabaseSchema <- "onek_results"
-#convention:   resultSchema = cohortDatabaseSchema = workSchema (if we need them for copied code)
-# cdmDatabaseSchema <- "mimic2omop"
-# cohortDatabaseSchema <- "mimic2omop_results"
-cohortTable <- "hiv_descriptive"
-outputFolder <- "~/temp/study_results" # c:/temp/study_results"
-cohortTable <- "hiv_cohort_table"
 
-connectionDetails <- createConnectionDetails(dbms = dbms,
-                                             user = user,
-                                             password = pw,
-                                             server = server,
-                                             port = port,
-                                             schema = cdmDatabaseSchema)
-connection <- DatabaseConnector::connect(connectionDetails)
+run <- function() {
+  #setwd('./HivDescriptive/')
+  source('~/secret/conn.R')
 
-covariates <- HivDescriptive::execute(connectionDetails = connectionDetails,
-                                      conn = connection,
-                                      cdmDatabaseSchema = cdmDatabaseSchema,
-                                      cohortDatabaseSchema = cohortDatabaseSchema,
-                                      cohortTable = cohortTable,
-                                      oracleTempSchema = NULL,
-                                      outputFolder = outputFolder,
-                                      createCohorts = TRUE,
-                                      packageResults = TRUE,
-                                      return = "covariates" # or "conn" or nothing
-)
+  cdm_database_schema <- cdmDatabaseSchema <- "onek"
+  resultsDatabaseSchema <- cohortDatabaseSchema <- "onek_results"
+  #convention:   resultSchema = cohortDatabaseSchema = workSchema (if we need them for copied code)
+  # cdmDatabaseSchema <- "mimic2omop"
+  # cohortDatabaseSchema <- "mimic2omop_results"
+  cohortTable <- "hiv_descriptive"
+  outputFolder <- "~/temp/study_results" # c:/temp/study_results"
+  cohortTable <- "hiv_cohort_table"
 
+  connectionDetails <- createConnectionDetails(dbms = dbms,
+                                               user = user,
+                                               password = pw,
+                                               server = server,
+                                               port = port,
+                                               schema = cdmDatabaseSchema)
+  connection <- DatabaseConnector::connect(connectionDetails)
+
+  covariates <- HivDescriptive::execute(connectionDetails = connectionDetails,
+                                        conn = connection,
+                                        cdmDatabaseSchema = cdmDatabaseSchema,
+                                        cohortDatabaseSchema = cohortDatabaseSchema,
+                                        cohortTable = cohortTable,
+                                        oracleTempSchema = NULL,
+                                        outputFolder = outputFolder,
+                                        createCohorts = TRUE,
+                                        packageResults = TRUE,
+                                        return = "covariates" # or "conn" or nothing
+  )
+  return(connection)
+}
+connection <- run()
 DatabaseConnector::disconnect(connection)
 
 # in order to have the cohort names connected to the cohort ids somewhere in the database:
