@@ -207,10 +207,6 @@ execute <- function(connectionDetails,
 #     ) all_covariates;')
 #
 	invisible(NULL)
-  if (return == "conn") {
-    return(conn)
-  }
-  DatabaseConnector::disconnect(conn)
   # return(result) # commented out code above creates results. returning nothing for now
 	return()
 }

@@ -38,6 +38,7 @@ run <- function() {
                                         oracleTempSchema = NULL,
                                         outputFolder = outputFolder,
                                         createCohorts = TRUE,
+                                        createCovariates = FALSE,
                                         packageResults = TRUE,
                                         return = "covariates" # or "conn" or nothing
   )
