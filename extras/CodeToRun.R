@@ -19,8 +19,10 @@ run <- function() {
   # cdmDatabaseSchema <- "mimic2omop"
   # cohortDatabaseSchema <- "mimic2omop_results"
   cohortTable <- "hiv_descriptive"
-  outputFolder <- "~/temp/study_results" # c:/temp/study_results"
   cohortTable <- "hiv_cohort_table"
+
+  outputFolder <- "~/temp/study_results" # c:/temp/study_results"
+  unlink(outputFolder, recursive = TRUE)
 
   connectionDetails <- createConnectionDetails(dbms = dbms,
                                                user = user,
@@ -38,7 +40,8 @@ run <- function() {
                                         oracleTempSchema = NULL,
                                         outputFolder = outputFolder,
                                         createCohorts = TRUE,
-                                        createCovariates = FALSE,
+                                        createCovariates = TRUE,
+                                        covarOutput = "table1",
                                         packageResults = TRUE,
                                         return = "covariates" # or "conn" or nothing
   )

@@ -57,7 +57,7 @@ execute <- function(connectionDetails,
                     cohortTable = 'hiv_cohort',  #consider removing the prefixes for cohort table
                     createCohorts = TRUE,
                     createCovariates = TRUE,
-                    createTable1 = TRUE,
+                    covarOutput = 'big.data.frame', # or 'table1'
                     oracleTempSchema = NULL,
                     outputFolder,
                     packageResults = TRUE,
@@ -100,7 +100,8 @@ execute <- function(connectionDetails,
                      cohortTable = cohortTable,
                      oracleTempSchema = NULL,
                      # outputFolder = outputFolder, # should cohort counts end up in export? assuming so for now:
-                     exportFolder = exportFolder
+                     exportFolder = exportFolder,
+                     covarOutput = covarOutput
     )
 
     print("ran createCovariates")

@@ -30,7 +30,9 @@ createCovariates <- function(connection,
                              cohortDatabaseSchema,
                              cohortTable,
                              oracleTempSchema,
-                             exportFolder) {
+                             exportFolder,
+                             covarOutput = 'big.data.frame' # or 'table1'
+                             ) {
   # copied code from vignette: https://raw.githubusercontent.com/OHDSI/FeatureExtraction/master/inst/doc/CreatingCovariatesUsingCohortAttributes.pdf
 
   # sql <- SqlRender::loadRenderTranslateSql(
@@ -78,28 +80,33 @@ createCovariates <- function(connection,
     if (covariates$metaData$populationSize) {
       aggcovariates <- aggregateCovariates(covariates)
 
-      # result <- createTable1(aggcovariates,
-      #                        specifications = getDefaultTable1Specifications(),
-      #                        output = "one column")
-
-      cresult <-
-        mrg(
+      result <- NULL
+      if (covarOutput == 'big.data.frame') {
+        result <-
           mrg(
             mrg(
-              mrg(data.frame(cohorts[1:2, i]),
-                  aggcovariates$covariateRef),
-              aggcovariates$analysisRef),
-            aggcovariates$covariates),
-          aggcovariates$covariatesContinuous)
+              mrg(
+                mrg(data.frame(cohorts[1:2, i]),
+                    aggcovariates$covariateRef),
+                aggcovariates$analysisRef),
+              aggcovariates$covariates),
+            aggcovariates$covariatesContinuous)
+      } else if (covarOutput == 'table1') {
+        result <- createTable1(aggcovariates,
+                               specifications = getDefaultTable1Specifications(),
+                               output = "one column")
+      } else {
+        warning(paste0('unknown covarOutput type: ', covarOutput))
+      }
+      # result$cohortId <- cohorts$cohortId[[i]]
+      # result$cohortName <- toString(cohorts$name[[i]])
+      fname <- paste0("covariates.", cohorts$cohortId[[i]], ".", cohorts$name[[i]], ".csv")
+      fpath <- file.path(exportFolder, fname)
+      write.csv(result, fpath, row.names = FALSE)
 
-      cresult$cohortId <- cohorts$cohortId[[i]]
-      cresult$cohortName <- toString(cohorts$name[[i]])
+      writeLines(paste0("Wrote covariates to ", exportFolder,"/", fname))
 
       # browser()
-
-      fname <- paste0(cohorts$name[[i]], "-covariates.csv")
-      writeLines(paste0("Writing covariates to ", exportFolder,"/", fname))
-      write.csv(cresult, file.path(exportFolder, fname), row.names = FALSE)
 
       # if( is.null(result)) {
       #   result <- cresult
