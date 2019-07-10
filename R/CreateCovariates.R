@@ -91,13 +91,16 @@ createCovariates <- function(connection,
       aggcovariates$analysisRef %>% ff::as.ram() -> aaref
       aggcovariates$covariatesContinuous %>% ff::as.ram() -> acvc
 
+      # if taking more covars, only those with cnt >= 11
+
+
       result <- NULL
       if (covarOutput == 'big.data.frame') {
         result <-
           acvs %>%
-          left_join(acvref) %>%
-          left_join(aaref) %>%
-          group_by(analysisId) %>%
+          dplyr::left_join(acvref) %>%
+          dplyr::left_join(aaref) %>%
+          dplyr::group_by(analysisId) %>%
           top_n(10, sumValue) %>% arrange(analysisName, -sumValue)
           # full_join(acvc)
       } else if (covarOutput == 'table1') {
