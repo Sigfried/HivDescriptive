@@ -93,7 +93,6 @@ createCovariates <- function(connection,
 
       result <- NULL
       if (covarOutput == 'big.data.frame') {
-        browser()
         result <-
           acvs %>%
           left_join(acvref) %>%

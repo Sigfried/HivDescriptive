@@ -43,8 +43,8 @@ run <- function() {
                                         createCovariates = TRUE,
                                         # covarOutput = "table1",
                                         covarOutput = "big.data.frame",
-                                        packageResults = TRUE,
-                                        return = "covariates" # or "conn" or nothing
+                                        packageResults = TRUE
+                                        # return = "covariates" # or "conn" or nothing
   )
   return(connection)
 }
