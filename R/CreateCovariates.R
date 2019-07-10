@@ -80,17 +80,27 @@ createCovariates <- function(connection,
     if (covariates$metaData$populationSize) {
       aggcovariates <- aggregateCovariates(covariates)
 
+      covariates$covariatesContinuous %>% ff::as.ram() -> cvcont
+      covariates$covariateRef %>% ff::as.ram() -> cvref
+      covariates$covariates %>% ff::as.ram() -> cvs
+      covariates$analysisRef %>% ff::as.ram() -> aref
+
+      aggcovariates$covariatesContinuous %>% ff::as.ram() -> acvcont
+      aggcovariates$covariateRef %>% ff::as.ram() -> acvref
+      aggcovariates$covariates %>% ff::as.ram() -> acvs
+      aggcovariates$analysisRef %>% ff::as.ram() -> aaref
+      aggcovariates$covariatesContinuous %>% ff::as.ram() -> acvc
+
       result <- NULL
       if (covarOutput == 'big.data.frame') {
+        browser()
         result <-
-          mrg(
-            mrg(
-              mrg(
-                mrg(data.frame(cohorts[1:2, i]),
-                    aggcovariates$covariateRef),
-                aggcovariates$analysisRef),
-              aggcovariates$covariates),
-            aggcovariates$covariatesContinuous)
+          acvs %>%
+          left_join(acvref) %>%
+          left_join(aaref) %>%
+          group_by(analysisId) %>%
+          top_n(10, sumValue) %>% arrange(analysisName, -sumValue)
+          # full_join(acvc)
       } else if (covarOutput == 'table1') {
         result <- createTable1(aggcovariates,
                                specifications = getDefaultTable1Specifications(),
@@ -161,6 +171,6 @@ createCovariates <- function(connection,
   # print(result, row.names = FALSE, right = FALSE)
 
 mrg <- function(df1, df2) {
-  return(merge(ff::as.ram(df1), ff::as.ram(df2), all = T))
+  return(full_join(ff::as.ram(df1), ff::as.ram(df2)))
 }
 

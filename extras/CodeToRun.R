@@ -1,6 +1,6 @@
-library(DatabaseConnector)
 library(SqlRender)
 library(FeatureExtraction)
+library(tidyverse)
 
 # remove.packages('HivDescriptive')
 # setwd("/export/home/goldss/projects/")
