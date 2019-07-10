@@ -1,9 +1,11 @@
 # HIV
 
 
-This study aims to study HIV.
+This study aims to study HIV. (identify and characterize a cohort; showcase data elements available in that cohort)
 
 Detailed information is available in the [protocol](https://github.com/Sigfried/HivDescriptive/blob/master/extras/HIV_protocol.docx?raw=true).
+
+To see an example of extracted aggregated data (no patient level data is being extracted), see folder [extras/sample_output]( https://github.com/Sigfried/HivDescriptive/tree/master/extras/sample_output).
 
 ## Requirements
 
@@ -12,12 +14,10 @@ Detailed information is available in the [protocol](https://github.com/Sigfried/
 - R version 3.4.0 or newer
 - On Windows: [RTools](http://cran.r-project.org/bin/windows/Rtools/)
 - [Java](http://java.com)
-- 25 GB of free disk space
 
 See [this video](https://youtu.be/K9_0s2Rchbo) for instructions on how to set up the R environment on Windows.
 
 ## How to run
-
 
 
 1. In `R`, use the following code to install the study package and its dependencies:
@@ -86,7 +86,7 @@ execute(connectionDetails = connectionDetails,
 	
 
 
-3. Email the file   ```export/studyResult.zip``` in the output folder to the study coordinator (Sigfried Gold) (encryption or password protection is not necessary since extracted data is on aggregated level only) :
+3. Email the file   ```export/studyResult.zip``` in the output folder to the study coordinator (Sigfried Gold) (extracted data is on aggregated level only) Optionaly, you can use the OHDSI encrypted submission using key and secret credentials.
 
 ## Getting Involved
 
