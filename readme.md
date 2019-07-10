@@ -5,6 +5,8 @@ This study aims to study HIV. (identify and characterize a cohort; showcase data
 
 Detailed information is available in the [protocol](https://github.com/Sigfried/HivDescriptive/blob/master/extras/HIV_protocol.docx?raw=true).
 
+To see an example of extracted aggregated data (no patient level data is being extracted), see folder [extras/sample_output]( https://github.com/Sigfried/HivDescriptive/tree/master/extras/sample_output).
+
 ## Requirements
 
 
