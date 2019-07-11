@@ -41,8 +41,7 @@ run <- function() {
                                         outputFolder = outputFolder,
                                         createCohorts = TRUE,
                                         createCovariates = TRUE,
-                                        # covarOutput = "table1",
-                                        covarOutput = "big.data.frame",
+                                        covarOutput = c("table1", "big.data.frame"),
                                         packageResults = TRUE
                                         # return = "covariates" # or "conn" or nothing
   )

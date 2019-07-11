@@ -57,7 +57,7 @@ execute <- function(connectionDetails,
                     cohortTable = 'hiv_cohort',  #consider removing the prefixes for cohort table
                     createCohorts = TRUE,
                     createCovariates = TRUE,
-                    covarOutput = 'big.data.frame', # or 'table1'
+                    covarOutput = c(), # 'big.data.frame', # or 'table1'
                     oracleTempSchema = NULL,
                     outputFolder,
                     packageResults = TRUE,

@@ -31,7 +31,7 @@ createCovariates <- function(connection,
                              cohortTable,
                              oracleTempSchema,
                              exportFolder,
-                             covarOutput = 'big.data.frame' # or 'table1'
+                             covarOutput = c("table1", "big.data.frame")
                              ) {
   # copied code from vignette: https://raw.githubusercontent.com/OHDSI/FeatureExtraction/master/inst/doc/CreatingCovariatesUsingCohortAttributes.pdf
 
@@ -80,10 +80,10 @@ createCovariates <- function(connection,
     if (covariates$metaData$populationSize) {
       aggcovariates <- aggregateCovariates(covariates)
 
-      covariates$covariatesContinuous %>% ff::as.ram() -> cvcont
-      covariates$covariateRef %>% ff::as.ram() -> cvref
-      covariates$covariates %>% ff::as.ram() -> cvs
-      covariates$analysisRef %>% ff::as.ram() -> aref
+      # covariates$covariatesContinuous %>% ff::as.ram() -> cvcont
+      # covariates$covariateRef %>% ff::as.ram() -> cvref
+      # covariates$covariates %>% ff::as.ram() -> cvs
+      # covariates$analysisRef %>% ff::as.ram() -> aref
 
       aggcovariates$covariatesContinuous %>% ff::as.ram() -> acvcont
       aggcovariates$covariateRef %>% ff::as.ram() -> acvref
@@ -95,26 +95,36 @@ createCovariates <- function(connection,
 
 
       result <- NULL
-      if (covarOutput == 'big.data.frame') {
+      if ('big.data.frame' %in% covarOutput) {
         result <-
           acvs %>%
           dplyr::left_join(acvref) %>%
           dplyr::left_join(aaref) %>%
           dplyr::group_by(analysisId) %>%
-          top_n(10, sumValue) %>% arrange(analysisName, -sumValue)
-          # full_join(acvc)
-      } else if (covarOutput == 'table1') {
+          dplyr::top_n(10, sumValue) %>% dplyr::arrange(analysisName, -sumValue)
+        fname <- paste0("covariates.", cohorts$cohortId[[i]], ".", cohorts$name[[i]], ".csv")
+        fpath <- file.path(exportFolder, fname)
+        write.csv(result, fpath, row.names = FALSE)
+
+        result <-
+          acvc %>%
+          dplyr::left_join(acvref) %>%
+          dplyr::left_join(aaref) %>%
+          dplyr::group_by(analysisId)
+        fname <- paste0("covariates.continuous.", cohorts$cohortId[[i]], ".", cohorts$name[[i]], ".csv")
+        fpath <- file.path(exportFolder, fname)
+        write.csv(result, fpath, row.names = FALSE)
+      }
+      if ('table1' %in% covarOutput) {
         result <- createTable1(aggcovariates,
                                specifications = getDefaultTable1Specifications(),
                                output = "one column")
-      } else {
-        warning(paste0('unknown covarOutput type: ', covarOutput))
+        fname <- paste0("table1.", cohorts$cohortId[[i]], ".", cohorts$name[[i]], ".csv")
+        fpath <- file.path(exportFolder, fname)
+        write.csv(result, fpath, row.names = FALSE)
       }
       # result$cohortId <- cohorts$cohortId[[i]]
       # result$cohortName <- toString(cohorts$name[[i]])
-      fname <- paste0("covariates.", cohorts$cohortId[[i]], ".", cohorts$name[[i]], ".csv")
-      fpath <- file.path(exportFolder, fname)
-      write.csv(result, fpath, row.names = FALSE)
 
       writeLines(paste0("Wrote covariates to ", exportFolder,"/", fname))
 
