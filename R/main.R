@@ -104,11 +104,16 @@ execute <- function(connectionDetails,
                      covarOutput = covarOutput
     )
 
-    print("ran createCovariates")
-    if (return == "covariates") {
-      return(covariates)
-    }
+    # print("ran createCovariates")
+    # if (return == "covariates") {
+    #   return(covariates)
+    # }
   }
+
+  vernum <- readLines(pipe("grep '^Version' ./DESCRIPTION"))
+  fpath <- file.path(exportFolder, "version.txt")
+  write(vernum, fpath)
+
 
   #consider removing this later
   outputFile <- file(paste0(outputFolder, '/outputLog.txt'))
