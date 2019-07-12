@@ -56,6 +56,7 @@ execute <- function(connectionDetails,
                     cohortDatabaseSchema,
                     cohortTable = 'hiv_cohort',  #consider removing the prefixes for cohort table
                     createCohorts = TRUE,
+                    covariateSettings = NULL,
                     createCovariates = TRUE,
                     covarOutput = c(), # 'big.data.frame', # or 'table1'
                     oracleTempSchema = NULL,
@@ -95,6 +96,7 @@ execute <- function(connectionDetails,
   if (createCovariates) {
     covariates <- createCovariates(connection = conn,
                      cohorts = cohortsToCreate,
+                     covariateSettings = covariateSettings,
                      cdmDatabaseSchema = cdmDatabaseSchema,
                      cohortDatabaseSchema = cohortDatabaseSchema,
                      cohortTable = cohortTable,

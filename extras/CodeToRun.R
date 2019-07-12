@@ -41,6 +41,7 @@ run <- function() {
                                         outputFolder = outputFolder,
                                         createCohorts = TRUE,
                                         createCovariates = TRUE,
+                                        covariateSettings = HivDescriptive::maxCovariateSettings(),
                                         covarOutput = c("table1", "big.data.frame"),
                                         packageResults = TRUE
                                         # return = "covariates" # or "conn" or nothing
