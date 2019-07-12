@@ -1,0 +1,2 @@
+"covariateId","countValue","minValue","maxValue","averageValue","standardDeviation","medianValue","p10Value","p25Value","p75Value","p90Value","covariateName","analysisId","conceptId","analysisName","domainId","startDay","endDay","isBinary","missingMeansZero"
+1904,39,0,5,2.64102564102564,1.01273936708367,2,1,2,3,4,"CHADS2VASc",904,0,"Chads2Vasc","Condition",NA,0,"N","Y"
