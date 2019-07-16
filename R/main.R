@@ -14,47 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#' Initialize HivDescriptive Tables
-#'
-#' @details
-#' This function initializes the HivDescriptive Study tables.
-#'
-#' @param connectionDetails    An object of type \code{connectionDetails} as created using the
-#'                             \code{\link[DatabaseConnector]{createConnectionDetails}} function in the
-#'                             DatabaseConnector package.
-#' @param targetDatabaseSchema The schema to contain the study results tables
-#'
-#' @param tablePrefix          A prefix to add to the study tables
-#'
-#' @examples
-#' \dontrun{
-#' connectionDetails <- DatatbaseConnector:: createConnectionDetails(dbms = "postgresql",
-#'                                              user = "joe",
-#'                                              password = "secret",
-#'                                              server = "myserver")
-#'
-#' execute(connectionDetails,
-#'         targetDatabaseSchema = "studyDB.endoStudy",
-#'         tablePrefix="endo_")
-#' }
-#'
-#' @export
-init <- function(connectionDetails, targetDatabaseSchema, tablePrefix="") {
 
-	conn <- DatabaseConnector::connect(connectionDetails);
-
-	# Create study cohort table structure:
-	sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "CreateCohortTable.sql",
-																					 packageName = packageName(),
-																					 dbms = attr(conn, "dbms"),
-																					 cohort_database_schema = targetDatabaseSchema,
-																					 cohort_table = paste0(tablePrefix, "cohort"))
-
-	DatabaseConnector::executeSql(conn, sql, progressBar = TRUE, reportOverallTime = FALSE)
-	DatabaseConnector::dbDisconnect(conn);
-
-	invisible(NULL)
-}
 
 #' Execute HivDescriptive Study
 #'
@@ -91,76 +51,79 @@ init <- function(connectionDetails, targetDatabaseSchema, tablePrefix="") {
 #'
 #' @export
 execute <- function(connectionDetails,
-										connp, studyp, #p prefix is making it complex
-										tablePrefix = "", #better eliminate
-										outputFolder,
-										createCohorts = TRUE,
-										cohortTable = 'hiv_cohort',  #consider removing the prefixes for cohort table
-										runDiagnostics = TRUE,
-										packageResults = FALSE
-) {
+                    conn = NULL,
+                    cdmDatabaseSchema,
+                    cohortDatabaseSchema,
+                    cohortTable = 'hiv_cohort',  #consider removing the prefixes for cohort table
+                    createCohorts = TRUE,
+                    covariateSettings = NULL,
+                    createCovariates = TRUE,
+                    covarOutput = c(), # 'big.data.frame', # or 'table1'
+                    oracleTempSchema = NULL,
+                    outputFolder,
+                    packageResults = TRUE,
+                    return = '') {
   #1. prepare folder, and create cohorts
-  outputFolder <- studyp$outputFolder
+  #outputFolder <- studyp$outputFolder
 	if (!file.exists(outputFolder))
 		dir.create(outputFolder, recursive = TRUE)
 
   #create export folder
-
   exportFolder <- file.path(outputFolder, "export")
   if (!file.exists(exportFolder))
     dir.create(exportFolder)
 
+  if (is.null(conn)) {
+    conn <- DatabaseConnector::connect(connectionDetails)
+  }
+
+  pathToCsv <- system.file("settings", "CohortsToCreate.csv", package = "HivDescriptive")
+  cohortsToCreate <- read.csv(pathToCsv)
+
+  if (createCohorts) {
+    createCohorts(connection = conn,
+                  cohortsToCreate = cohortsToCreate,
+                  cdmDatabaseSchema = cdmDatabaseSchema,
+                  cohortDatabaseSchema = cohortDatabaseSchema,
+                  cohortTable = cohortTable,
+                  oracleTempSchema = NULL,
+                  # outputFolder = outputFolder, # should cohort counts end up in export? assuming so for now:
+                  outputFolder = exportFolder
+    )
+  }
+  print("ran createCohorts")
+
+  if (createCovariates) {
+    covariates <- createCovariates(connection = conn,
+                     cohorts = cohortsToCreate,
+                     covariateSettings = covariateSettings,
+                     cdmDatabaseSchema = cdmDatabaseSchema,
+                     cohortDatabaseSchema = cohortDatabaseSchema,
+                     cohortTable = cohortTable,
+                     oracleTempSchema = NULL,
+                     # outputFolder = outputFolder, # should cohort counts end up in export? assuming so for now:
+                     exportFolder = exportFolder,
+                     covarOutput = covarOutput
+    )
+
+    # print("ran createCovariates")
+    # if (return == "covariates") {
+    #   return(covariates)
+    # }
+  }
+
+  vernum <- readLines(pipe("grep '^Version' ./DESCRIPTION"))
+  fpath <- file.path(exportFolder, "version.txt")
+  write(vernum, fpath)
 
 
-#consider removing this later
+  #consider removing this later
   outputFile <- file(paste0(outputFolder, '/outputLog.txt'))
-
 	# OhdsiRTools::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
-
-  dbms <- connp$dbms
-
-	conn <- DatabaseConnector::connect(connectionDetails)
-
-
-	#TODO create all the cohorts here
-	sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "Male50plus.sql",
-	                                         # Male50plus requires target_cohort_id
-	                                         target_cohort_id = 1,
-	                                         packageName = packageName(),
-	                                         dbms,
-	                                         cdm_database_schema = connp$schema,
-	                                         vocabulary_database_schema = connp$vocab_schema,
-	                                         target_database_schema = connp$results_schema,
-	                                         target_cohort_table = cohortTable)
-
-	DatabaseConnector::executeSql(conn, sql)
-
-#2. count it with group by
-	# Fetch cohort counts:
-	sql <- "SELECT cohort_definition_id, COUNT(*) AS count FROM @cohort_database_schema.@cohort_table GROUP BY cohort_definition_id"
-	sql <- SqlRender::renderSql(sql,
-	                            cohort_database_schema = connp$results_schema,
-	                            cohort_table = cohortTable)$sql
-	sql <- SqlRender::translateSql(sql, targetDialect = attr(connection, "dbms"))$sql
-	counts <- DatabaseConnector::querySql(connection, sql)
-	#trying to stick the the style of OHDSI
-	names(counts) <- SqlRender::snakeCaseToCamelCase(names(counts))
-
-	#since we are in execute, we don't have the cohortToCreate object so commenting it out
-	# counts <- merge(counts, data.frame(cohortDefinitionId = cohortsToCreate$cohortId,
-	#                                    cohortName  = cohortsToCreate$name))
-	write.csv(counts, file.path(exportFolder, "CohortCounts.csv"))
-
-
-
-
 
 	if (packageResults) {
 	  #OhdsiRTools::logInfo("Packaging results")
-	 packageResults(connectionDetails = connectionDetails,
-	                 cdmDatabaseSchema = cdmDatabaseSchema,
-	                 outputFolder = outputFolder,
-	                 minCellCount = minCellCount)
+	 packageResults(outputFolder = outputFolder)
 	}
 
 #   #create a a csv file into export folder (with the counts) (pick your design, e.g., one line per cohort
@@ -251,12 +214,9 @@ execute <- function(connectionDetails,
 #     SELECT row_id, covariate_id, covariate_value FROM cov_3
 #     ) all_covariates;')
 #
-
-
-	DatabaseConnector::disconnect(conn)
-
 	invisible(NULL)
-	return(result)
+  # return(result) # commented out code above creates results. returning nothing for now
+	return()
 }
   # cut from execute function:
   # if (createCohorts) {

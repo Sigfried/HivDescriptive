@@ -1,0 +1,59 @@
+"covariateId","sumValue","averageValue","covariateName","analysisId","conceptId","analysisName","domainId","startDay","endDay","isBinary","missingMeansZero"
+439727101,39,1,"condition_occurrence any time prior through 0 days relative to index: Human immunodeficiency virus infection",101,439727,"ConditionOccurrenceAnyTimePrior","Condition",NA,0,"Y",NA
+320128101,35,0.897435897435897,"condition_occurrence any time prior through 0 days relative to index: Essential hypertension",101,320128,"ConditionOccurrenceAnyTimePrior","Condition",NA,0,"Y",NA
+201826101,32,0.82051282051282,"condition_occurrence any time prior through 0 days relative to index: Type 2 diabetes mellitus",101,201826,"ConditionOccurrenceAnyTimePrior","Condition",NA,0,"Y",NA
+312648101,31,0.794871794871795,"condition_occurrence any time prior through 0 days relative to index: Benign essential hypertension",101,312648,"ConditionOccurrenceAnyTimePrior","Condition",NA,0,"Y",NA
+432867101,29,0.743589743589744,"condition_occurrence any time prior through 0 days relative to index: Hyperlipidemia",101,432867,"ConditionOccurrenceAnyTimePrior","Condition",NA,0,"Y",NA
+439777101,24,0.615384615384615,"condition_occurrence any time prior through 0 days relative to index: Anemia",101,439777,"ConditionOccurrenceAnyTimePrior","Condition",NA,0,"Y",NA
+77670101,23,0.58974358974359,"condition_occurrence any time prior through 0 days relative to index: Chest pain",101,77670,"ConditionOccurrenceAnyTimePrior","Condition",NA,0,"Y",NA
+255573101,23,0.58974358974359,"condition_occurrence any time prior through 0 days relative to index: Chronic obstructive lung disease",101,255573,"ConditionOccurrenceAnyTimePrior","Condition",NA,0,"Y",NA
+437827101,23,0.58974358974359,"condition_occurrence any time prior through 0 days relative to index: Pure hypercholesterolemia",101,437827,"ConditionOccurrenceAnyTimePrior","Condition",NA,0,"Y",NA
+81902101,22,0.564102564102564,"condition_occurrence any time prior through 0 days relative to index: Urinary tract infectious disease",101,81902,"ConditionOccurrenceAnyTimePrior","Condition",NA,0,"Y",NA
+140673101,22,0.564102564102564,"condition_occurrence any time prior through 0 days relative to index: Hypothyroidism",101,140673,"ConditionOccurrenceAnyTimePrior","Condition",NA,0,"Y",NA
+313217101,22,0.564102564102564,"condition_occurrence any time prior through 0 days relative to index: Atrial fibrillation",101,313217,"ConditionOccurrenceAnyTimePrior","Condition",NA,0,"Y",NA
+15003,10,0.256410256410256,"age group: 75-79",3,0,"DemographicsAgeGroup","Demographics",NA,NA,"Y",NA
+14003,8,0.205128205128205,"age group: 70-74",3,0,"DemographicsAgeGroup","Demographics",NA,NA,"Y",NA
+13003,6,0.153846153846154,"age group: 65-69",3,0,"DemographicsAgeGroup","Demographics",NA,NA,"Y",NA
+17003,4,0.102564102564103,"age group: 85-89",3,0,"DemographicsAgeGroup","Demographics",NA,NA,"Y",NA
+16003,3,0.0769230769230769,"age group: 80-84",3,0,"DemographicsAgeGroup","Demographics",NA,NA,"Y",NA
+12003,2,0.0512820512820513,"age group: 60-64",3,0,"DemographicsAgeGroup","Demographics",NA,NA,"Y",NA
+18003,2,0.0512820512820513,"age group: 90-94",3,0,"DemographicsAgeGroup","Demographics",NA,NA,"Y",NA
+7003,1,0.0256410256410256,"age group: 35-39",3,0,"DemographicsAgeGroup","Demographics",NA,NA,"Y",NA
+9003,1,0.0256410256410256,"age group: 45-49",3,0,"DemographicsAgeGroup","Demographics",NA,NA,"Y",NA
+10003,1,0.0256410256410256,"age group: 50-54",3,0,"DemographicsAgeGroup","Demographics",NA,NA,"Y",NA
+19003,1,0.0256410256410256,"age group: 95-99",3,0,"DemographicsAgeGroup","Demographics",NA,NA,"Y",NA
+38003564005,37,0.948717948717949,"ethnicity = Not Hispanic or Latino",5,38003564,"DemographicsEthnicity","Demographics",NA,NA,"Y",NA
+8532001,23,0.58974358974359,"gender = FEMALE",1,8532,"DemographicsGender","Demographics",NA,NA,"Y",NA
+8507001,16,0.41025641025641,"gender = MALE",1,8507,"DemographicsGender","Demographics",NA,NA,"Y",NA
+8527004,34,0.871794871794872,"race = White",4,8527,"DemographicsRace","Demographics",NA,NA,"Y",NA
+8516004,3,0.0769230769230769,"race = Black or African American",4,8516,"DemographicsRace","Demographics",NA,NA,"Y",NA
+19076600301,10,0.256410256410256,"drug_exposure any time prior through 0 days relative to index: Dipyridamole 25 MG Oral Tablet",301,19076600,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+40164929301,10,0.256410256410256,"drug_exposure any time prior through 0 days relative to index: Metformin hydrochloride 500 MG Oral Tablet",301,40164929,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+19025280301,9,0.230769230769231,"drug_exposure any time prior through 0 days relative to index: Oxygen 99 % Gas for Inhalation",301,19025280,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+19078924301,9,0.230769230769231,"drug_exposure any time prior through 0 days relative to index: Midazolam 1 MG/ML Injectable Solution",301,19078924,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+19019116301,8,0.205128205128205,"drug_exposure any time prior through 0 days relative to index: Lovastatin 20 MG Oral Tablet",301,19019116,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+19077546301,8,0.205128205128205,"drug_exposure any time prior through 0 days relative to index: Furosemide 20 MG Oral Tablet",301,19077546,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+19077577301,8,0.205128205128205,"drug_exposure any time prior through 0 days relative to index: Gemfibrozil 600 MG Oral Tablet",301,19077577,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+40234795301,8,0.205128205128205,"drug_exposure any time prior through 0 days relative to index: triamcinolone diacetate 10 MG/ML Injectable Suspension",301,40234795,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+964362301,7,0.179487179487179,"drug_exposure any time prior through 0 days relative to index: Sulfasalazine 500 MG Oral Tablet",301,964362,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+1331312301,7,0.179487179487179,"drug_exposure any time prior through 0 days relative to index: Dipyridamole 50 MG Oral Tablet",301,1331312,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+1539411301,7,0.179487179487179,"drug_exposure any time prior through 0 days relative to index: Simvastatin 20 MG Oral Tablet",301,1539411,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+19019309301,7,0.179487179487179,"drug_exposure any time prior through 0 days relative to index: Nifedipine 10 MG Oral Capsule",301,19019309,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+19019418301,7,0.179487179487179,"drug_exposure any time prior through 0 days relative to index: Omeprazole 20 MG Delayed Release Oral Capsule",301,19019418,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+19076623301,7,0.179487179487179,"drug_exposure any time prior through 0 days relative to index: Dipyridamole 75 MG Oral Tablet",301,19076623,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+19078106301,7,0.179487179487179,"drug_exposure any time prior through 0 days relative to index: Hydrochlorothiazide 25 MG Oral Tablet",301,19078106,"DrugExposureAnyTimePrior","Drug",NA,0,"Y",NA
+440216701,10,0.256410256410256,"measurement any time prior through 0 days relative to index: Abnormal glucose tolerance test",701,440216,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA
+40482801701,10,0.256410256410256,"measurement any time prior through 0 days relative to index: Type II diabetes mellitus uncontrolled",701,40482801,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA
+434164701,9,0.230769230769231,"measurement any time prior through 0 days relative to index: Glycosuria",701,434164,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA
+436230701,8,0.205128205128205,"measurement any time prior through 0 days relative to index: Blood chemistry abnormal",701,436230,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA
+320536701,5,0.128205128205128,"measurement any time prior through 0 days relative to index: Electrocardiogram abnormal",701,320536,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA
+438557701,5,0.128205128205128,"measurement any time prior through 0 days relative to index: Abnormal glucose level",701,438557,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA
+2617206701,5,0.128205128205128,"measurement any time prior through 0 days relative to index: Prostate cancer screening; prostate specific antigen test (psa)",701,2617206,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA
+435928701,4,0.102564102564103,"measurement any time prior through 0 days relative to index: Abnormal weight loss",701,435928,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA
+438878701,4,0.102564102564103,"measurement any time prior through 0 days relative to index: Liver function tests abnormal",701,438878,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA
+134315701,3,0.0769230769230769,"measurement any time prior through 0 days relative to index: Myelophthisis",701,134315,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA
+437677701,3,0.0769230769230769,"measurement any time prior through 0 days relative to index: Abnormal findings on diagnostic imaging of lung",701,437677,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA
+441692701,3,0.0769230769230769,"measurement any time prior through 0 days relative to index: Finding of serum tumor marker level",701,441692,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA
+441968701,3,0.0769230769230769,"measurement any time prior through 0 days relative to index: Acetonuria",701,441968,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA
+441969701,3,0.0769230769230769,"measurement any time prior through 0 days relative to index: Radiology result abnormal",701,441969,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA
+4245252701,3,0.0769230769230769,"measurement any time prior through 0 days relative to index: Raised prostate specific antigen",701,4245252,"MeasurementAnyTimePrior","Measurement",NA,0,"Y",NA

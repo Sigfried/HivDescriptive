@@ -4,20 +4,14 @@
 \alias{execute}
 \title{Execute HivDescriptive Study}
 \usage{
-execute(connectionDetails, connp, studyp, tablePrefix = "", outputFolder,
-  createCohorts = TRUE, cohortTable, runDiagnostics = TRUE,
-  packageResults = FALSE)
+execute(connectionDetails, cdmDatabaseSchema, cohortDatabaseSchema,
+  createCohorts = TRUE, cohortTable = "hiv_cohort",
+  oracleTempSchema = NULL, outputFolder, packageResults = TRUE)
 }
 \arguments{
 \item{connectionDetails}{An object of type \code{connectionDetails} as created using the
 \code{\link[DatabaseConnector]{createConnectionDetails}} function in the
 DatabaseConnector package.}
-
-\item{tablePrefix}{The prefix for the study tables, should be same value used in init()}
-
-\item{outputFolder}{Name of local folder to place results; make sure to use forward slashes
-(/). Do not use a folder on a network drive since this greatly impacts
-performance.}
 
 \item{cdmDatabaseSchema}{Schema name where your patient-level data in OMOP CDM format resides.
 Note that for SQL Server, this should include both the database and
@@ -25,6 +19,12 @@ schema name, for example 'cdm_data.dbo'.}
 
 \item{oracleTempSchema}{Should be used in Oracle to specify a schema where the user has write
 priviliges for storing temporary tables.}
+
+\item{outputFolder}{Name of local folder to place results; make sure to use forward slashes
+(/). Do not use a folder on a network drive since this greatly impacts
+performance.}
+
+\item{tablePrefix}{The prefix for the study tables, should be same value used in init()}
 }
 \description{
 Execute HivDescriptive Study
