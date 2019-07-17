@@ -63,7 +63,6 @@ execute(connectionDetails = connectionDetails,
 	oracleTempSchema = NULL,
 	outputFolder = outputfolder,
 	createCohorts = TRUE,
-	runAnalyses = TRUE,
 	packageResults = TRUE,
 	#maxCores = 30
 	)
