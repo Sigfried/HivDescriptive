@@ -36,46 +36,33 @@ createCovariates <- function(connection,
                              ) {
   # copied code from vignette: https://raw.githubusercontent.com/OHDSI/FeatureExtraction/master/inst/doc/CreatingCovariatesUsingCohortAttributes.pdf
 
-  # sql <- SqlRender::loadRenderTranslateSql(
-  #   "LengthOfObsCohortAttr.sql",
-  #   packageName = "HivDescriptive",
-  #   dbms = attr(connection, "dbms"),
-  #   cdm_database_schema = cdmDatabaseSchema,
-  #   cohort_database_schema = cohortDatabaseSchema,
-  #   cohort_table = "hiv_cohort_table",
-  #   cohort_attribute_table = "loo_cohort_attr",
-  #   attribute_definition_table = "loo_attr_def",
-  #   cohort_definition_ids = cohorts$cohortId)
+  sql <- SqlRender::loadRenderTranslateSql(
+    "LengthOfObsCohortAttr.sql",
+    packageName = "HivDescriptive",
+    dbms = attr(connection, "dbms"),
+    cdm_database_schema = cdmDatabaseSchema,
+    cohort_database_schema = cohortDatabaseSchema,
+    cohort_table = "hiv_cohort_table",
+    cohort_attribute_table = "loo_cohort_attr",
+    attribute_definition_table = "loo_attr_def",
+    cohort_definition_ids = cohorts$cohortId)
   # cat(sql)
-  # executeSql(connection, sql)
-  covariateSettings <- createCovariateSettings(useDemographicsGender = TRUE,
-                                               useDemographicsAgeGroup = TRUE,
-                                               useDemographicsRace = TRUE,
-                                               useDemographicsEthnicity = TRUE,
-                                               useConditionOccurrenceAnyTimePrior = TRUE,
-                                               useDrugExposureAnyTimePrior = TRUE,
-                                               useChads2Vasc = TRUE,
-                                               useMeasurementAnyTimePrior = TRUE
-  )
-  covariateSettings <- maxCovariateSettings()
+  executeSql(connection, sql)
 
-  # looCovSet <- createCohortAttrCovariateSettings(attrDatabaseSchema = cohortDatabaseSchema,
-  #                                                cohortAttrTable = "loo_cohort_attr",
-  #                                                attrDefinitionTable = "loo_attr_def")
-  #
-  # covariateSettingsList <- list(covariateSettings, looCovSet)
-  # browser()
+  looCovSet <- createCohortAttrCovariateSettings(attrDatabaseSchema = cohortDatabaseSchema,
+                                                 cohortAttrTable = "loo_cohort_attr",
+                                                 attrDefinitionTable = "loo_attr_def")
 
-  # result = NULL
-  for (i in 1:nrow(cohorts)) {
+  covariateSettingsList <- list(covariateSettings, looCovSet)
+
+    for (i in 1:nrow(cohorts)) {
     writeLines(paste("Creating covariates for cohort", cohorts$name[i]))
     covariates <- getDbCovariateData(connection = connection,
                                      cdmDatabaseSchema = cdmDatabaseSchema,
                                      cohortDatabaseSchema = cohortDatabaseSchema,
                                      cohortTable = "hiv_cohort_table",
                                      cohortId = cohorts$cohortId[i],
-                                     # covariateSettings = covariateSettingsList
-                                     covariateSettings = covariateSettings
+                                     covariateSettings = covariateSettingsList
     )
     # browser()
 
@@ -116,6 +103,8 @@ createCovariates <- function(connection,
         fname <- paste0("covariates.continuous.", cohorts$cohortId[[i]], ".", cohorts$name[[i]], ".csv")
         fpath <- file.path(exportFolder, fname)
         write.csv(result, fpath, row.names = FALSE)
+
+        browser()
       }
       if ('table1' %in% covarOutput) {
         result <- createTable1(aggcovariates,

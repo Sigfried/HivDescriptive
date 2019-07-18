@@ -32,7 +32,8 @@ run <- function() {
                                                schema = cdmDatabaseSchema)
   connection <- DatabaseConnector::connect(connectionDetails)
 
-  covariates <- HivDescriptive::execute(connectionDetails = connectionDetails,
+  # covariates <-
+  HivDescriptive::execute(connectionDetails = connectionDetails,
                                         conn = connection,
                                         cdmDatabaseSchema = cdmDatabaseSchema,
                                         cohortDatabaseSchema = cohortDatabaseSchema,
@@ -41,7 +42,8 @@ run <- function() {
                                         outputFolder = outputFolder,
                                         createCohorts = TRUE,
                                         createCovariates = TRUE,
-                                        covariateSettings = HivDescriptive::maxCovariateSettings(),
+                                        # covariateSettings = HivDescriptive::maxCovariateSettings(),
+                                        covariateSettings = HivDescriptive::basicCovariateSettings(),
                                         covarOutput = c("table1", "big.data.frame"),
                                         packageResults = TRUE
                                         # return = "covariates" # or "conn" or nothing
