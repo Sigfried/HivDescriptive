@@ -58,7 +58,7 @@ createCovariates <- function(connection,
 
   covariateSettingsList <- list(covariateSettings, looCovSet)
     for (i in 1:nrow(cohorts)) {
-    writeLines(paste("Creating covariates for cohort", cohorts$name[i]))
+    # writeLines(paste("Creating covariates for cohort", cohorts$name[i]))
     covariates <- getDbCovariateData(connection = connection,
                                      cdmDatabaseSchema = cdmDatabaseSchema,
                                      cohortDatabaseSchema = cohortDatabaseSchema,
@@ -69,36 +69,6 @@ createCovariates <- function(connection,
     )
     if (covariates$metaData$populationSize) {
       aggcovariates <- aggregateCovariates(covariates)
-
-
-
-
-
-
-
-
-
-
-      # notes for next thing to do:
-      #
-      # work on aggregation function for specific custom covariate. maybe aggregate
-      # after generating rather than in the generating function itself
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
       # covariates$covariatesContinuous %>% ff::as.ram() -> cvcont
       # covariates$covariateRef %>% ff::as.ram() -> cvref

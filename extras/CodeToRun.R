@@ -1,4 +1,5 @@
 library(SqlRender)
+# devtools::install_git('https://github.com/OHDSI/FeatureExtraction', ref = 'develop')
 library(FeatureExtraction)
 library(tidyverse)
 
