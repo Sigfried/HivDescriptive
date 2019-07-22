@@ -35,27 +35,8 @@ createCovariates <- function(connection,
                              exportFolder,
                              covarOutput = c("table1", "big.data.frame")
                              ) {
-  # copied code from vignette: https://raw.githubusercontent.com/OHDSI/FeatureExtraction/master/inst/doc/CreatingCovariatesUsingCohortAttributes.pdf
 
-  sql <- SqlRender::loadRenderTranslateSql(
-    "LengthOfObsCohortAttr.sql",
-    packageName = "HivDescriptive",
-    dbms = attr(connection, "dbms"),
-    cdm_database_schema = cdmDatabaseSchema,
-    cohort_database_schema = cohortDatabaseSchema,
-    cohort_table = "hiv_cohort_table",
-    cohort_attribute_table = "loo_cohort_attr",
-    attribute_definition_table = "loo_attr_def",
-    cohort_definition_ids = cohorts$cohortId)
-  # cat(sql)
-  executeSql(connection, sql)
-
-  # creating custom covarirate from cohort attribute, but can't aggregate:
-  # looCovSet <- createCohortAttrCovariateSettings(attrDatabaseSchema = cohortDatabaseSchema,
-  #                                                cohortAttrTable = "loo_cohort_attr",
-  #                                                attrDefinitionTable = "loo_attr_def")
   looCovSet <- createLooCovariateSettings()
-
 
   covariateSettingsList <- list(covariateSettings, looCovSet)
     for (i in 1:nrow(cohorts)) {
