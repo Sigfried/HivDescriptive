@@ -57,6 +57,7 @@ execute <- function(connectionDetails,
                     cohortTable = 'hiv_cohort',  #consider removing the prefixes for cohort table
                     createCohorts = TRUE,
                     covariateSettings = NULL,
+                    min_cell_count = NULL,
                     createCovariates = TRUE,
                     covarOutput = c(), # 'big.data.frame', # or 'table1'
                     oracleTempSchema = NULL,
@@ -100,6 +101,7 @@ execute <- function(connectionDetails,
                      cdmDatabaseSchema = cdmDatabaseSchema,
                      cohortDatabaseSchema = cohortDatabaseSchema,
                      cohortTable = cohortTable,
+                     min_cell_count = min_cell_count,
                      oracleTempSchema = NULL,
                      # outputFolder = outputFolder, # should cohort counts end up in export? assuming so for now:
                      exportFolder = exportFolder,

@@ -26,6 +26,7 @@
 createCovariates <- function(connection,
                              cohorts = c(), # coming from CohortsToCreate.csv
                              covariateSettings = basicCovariateSettings(),
+                             min_cell_count = 5,
                              cdmDatabaseSchema,
                              vocabularyDatabaseSchema = cdmDatabaseSchema,
                              cohortDatabaseSchema,
@@ -87,6 +88,7 @@ createCovariates <- function(connection,
       if ('big.data.frame' %in% covarOutput) {
         result <-
           acvs %>%
+          filter(is.numeric(sumValue) & sumValue >= min_cell_count) %>%
           dplyr::left_join(acvref) %>%
           dplyr::left_join(aaref) %>%
           dplyr::group_by(analysisId) %>%
@@ -97,6 +99,7 @@ createCovariates <- function(connection,
 
         result <-
           acvc %>%
+          filter(is.numeric(countValue) & countValue >= min_cell_count) %>%
           dplyr::left_join(acvref) %>%
           dplyr::left_join(aaref) %>%
           dplyr::group_by(analysisId)
