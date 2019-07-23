@@ -15,6 +15,7 @@ run <- function() {
   source('~/secret/conn.R')
 
   min_cell_count = 5
+  top_n_meds = 10
   cdm_database_schema <- cdmDatabaseSchema <- "onek"
   resultsDatabaseSchema <- cohortDatabaseSchema <- "onek_results"
   #convention:   resultSchema = cohortDatabaseSchema = workSchema (if we need them for copied code)
@@ -47,6 +48,7 @@ run <- function() {
                                         # covariateSettings = HivDescriptive::maxCovariateSettings(),
                                         covariateSettings = HivDescriptive::basicCovariateSettings(),
                                         min_cell_count = min_cell_count,
+                                        top_n_meds = top_n_meds,
                                         covarOutput = c("table1", "big.data.frame"),
                                         packageResults = TRUE
                                         # return = "covariates" # or "conn" or nothing

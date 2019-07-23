@@ -1,7 +1,7 @@
 Package: HivDescriptive
 Type: Package
 Title: HIV Basic Descriptive Study for DRN Use
-Version: 4.3
+Version: 5.0
 Author: Sigfried Gold <sigfried@sigfried.org>
   Vojtech Huser <vojtech.huser@nih.gov>
 Maintainer: Sigfried Gold <sigfried@sigfried.org>

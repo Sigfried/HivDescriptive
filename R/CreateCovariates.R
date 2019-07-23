@@ -27,6 +27,7 @@ createCovariates <- function(connection,
                              cohorts = c(), # coming from CohortsToCreate.csv
                              covariateSettings = basicCovariateSettings(),
                              min_cell_count = 5,
+                             top_n_meds = 10,
                              cdmDatabaseSchema,
                              vocabularyDatabaseSchema = cdmDatabaseSchema,
                              cohortDatabaseSchema,
@@ -42,26 +43,27 @@ createCovariates <- function(connection,
   #                                                     cohortAttrTable = "top_n_meds_cohort_attr",
   #                                                     attrDefinitionTable = "top_n_meds_attr_def")
 
-
-  covariateSettingsList <- list(covariateSettings, looCovSet, topMedsCovSet)
+  covariateSettingsList <- list(covariateSettings, looCovSet) #, topMedsCovSet
   for (i in 1:nrow(cohorts)) {
     # writeLines(paste("Creating covariates for cohort", cohorts$name[i]))
 
     # FIGURE OUT WHAT TO DO HERE, LOOP THROUGH COHORTS FOR COVARS? LOOP THROUGH COVARS?
 
-    sql <- SqlRender::loadRenderTranslateSql(
-      "TopNMedsCohortAttr.sql",
-      packageName = "HivDescriptive",
-      dbms = attr(connection, "dbms"),
-      cdm_database_schema = cdmDatabaseSchema,
-      cohort_database_schema = cohortDatabaseSchema,
-      cohort_table = "hiv_cohort_table",
-      cohort_attribute_table = "top_n_meds_cohort_attr",
-      attribute_definition_table = "top_n_meds_attr_def",
-      cohort_definition_ids = cohorts$cohortId,
-    )
-    # cat(sql)
-    executeSql(connection, sql)
+    # sql <- SqlRender::loadRenderTranslateSql(
+    #   "TopNMedsCohortAttr.sql",
+    #   packageName = "HivDescriptive",
+    #   dbms = attr(connection, "dbms"),
+    #   cdm_database_schema = cdmDatabaseSchema,
+    #   cohort_database_schema = cohortDatabaseSchema,
+    #   cohort_table = "hiv_cohort_table",
+    #   cohort_attribute_table = "top_n_meds_cohort_attr",
+    #   attribute_definition_table = "top_n_meds_attr_def",
+    #   cohort_definition_ids = cohorts$cohortId,
+    #   top_n_meds = top_n_meds,
+    #
+    # )
+    # # cat(sql)
+    # executeSql(connection, sql)
 
     covariates <- getDbCovariateData(connection = connection,
                                      cdmDatabaseSchema = cdmDatabaseSchema,
@@ -95,7 +97,7 @@ createCovariates <- function(connection,
           dplyr::left_join(acvref) %>%
           dplyr::left_join(aaref) %>%
           dplyr::group_by(analysisId) %>%
-          dplyr::top_n(10, sumValue) %>% dplyr::arrange(analysisName, -sumValue)
+          dplyr::top_n(min_cell_count, sumValue) %>% dplyr::arrange(analysisName, -sumValue)
         fname <- paste0("covariates.", cohorts$cohortId[[i]], ".", cohorts$name[[i]], ".csv")
         fpath <- file.path(exportFolder, fname)
         write.csv(result, fpath, row.names = FALSE)
@@ -374,12 +376,12 @@ getDbLooCovariateData <- function(connection,
 
 # createTopMedsCovariateSettings <- function(useTopMeds = TRUE,
 #                                            min_cell_count = NULL,
-#                                            top_n = 10
+#                                            top_n_meds = 10
 #   ) {
 #   covariateSettings <- list(useLengthOfObs = useTopMeds)
 #   covariateSettings <- list(useLengthOfObs = useLengthOfObs,
 #                             min_cell_count = min_cell_count,
-#                             top_n = top_n)
+#                             top_n_meds = top_n_meds)
 #   attr(covariateSettings, "fun") <- "getDbTopMedsCovariateData"
 #   class(covariateSettings) <- "covariateSettings"
 #   return(covariateSettings)
@@ -400,8 +402,8 @@ getDbLooCovariateData <- function(connection,
 #   }
 #   if (!is.numeric(covariateSettings$min_cell_count))
 #     stop("min_cell_count not numeric")
-#   if (!is.numeric(covariateSettings$top_n))
-#     stop("top_n not numeric")
+#   if (!is.numeric(covariateSettings$top_n_meds))
+#     stop("top_n_meds not numeric")
 #   if (aggregated)
 #     stop("Aggregation not supported here, use aggregateCovariates()")
 #   # Some SQL to construct the covariate:
@@ -419,10 +421,10 @@ getDbLooCovariateData <- function(connection,
 #                ")",
 #                "SELECT drug_concept_id, count(*) cnt",
 #                "FROM cohort_drugs",
-#                "GROUP BY 1",
+#                "GROUP BY 1",     #   fix to not be postgres specific!!!!!!
 #                "HAVING count(*) >= @min_cell_count",
 #                "ORDER by 2 DESC",
-#                "LIMIT @top_n",
+#                "LIMIT @top_n_meds",
 #                "SELECT c.concept_name as drug_name, cd.row_id, count(*) cnt",
 #                "FROM (",
 #                "  SELECT drug_concept_id, count(*) cnt",
@@ -430,7 +432,7 @@ getDbLooCovariateData <- function(connection,
 #                "  GROUP BY 1",
 #                "  HAVING count(*) >= @min_cell_count",
 #                "  ORDER by 2 DESC",
-#                "  LIMIT @top_n",
+#                "  LIMIT @top_n_meds",
 #                ") topdrugs",
 #                "INNER JOIN cohort_drugs cd ON topdrugs.drug_concept_id = cd.drug_concept_id",
 #                "INNER JOIN @cdm_database_schema.concept c ON topdrugs.drug_concept_id = c.concept_id",
@@ -441,7 +443,7 @@ getDbLooCovariateData <- function(connection,
 #                            row_id_field = rowIdField,
 #                            cdm_database_schema = cdmDatabaseSchema,
 #                            min_cell_count = covariateSettings$min_cell_count,
-#                            top_n = covariateSettings$top_n)
+#                            top_n_meds = covariateSettings$top_n_meds)
 #   sql <- SqlRender::translate(sql, targetDialect = attr(connection, "dbms"))
 #   writeLines('top meds sql:')
 #   writeLines(sql)
