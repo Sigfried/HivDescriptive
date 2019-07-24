@@ -28,6 +28,7 @@ createCovariates <- function(connection,
                              covariateSettings = basicCovariateSettings(),
                              min_cell_count = 5,
                              top_n_meds = 10,
+                             row_id_field = "subject_id",
                              cdmDatabaseSchema,
                              vocabularyDatabaseSchema = cdmDatabaseSchema,
                              cohortDatabaseSchema,
@@ -42,27 +43,50 @@ createCovariates <- function(connection,
   # topNMedsCovSet <- createCohortAttrCovariateSettings(attrDatabaseSchema = cohortDatabaseSchema,
   #                                                     cohortAttrTable = "top_n_meds_cohort_attr",
   #                                                     attrDefinitionTable = "top_n_meds_attr_def")
-
   covariateSettingsList <- list(covariateSettings, looCovSet) #, topMedsCovSet
+
+
+   sql <- SqlRender::loadRenderTranslateSql(
+    "TopNMedsCohortAttr.sql",
+    block_to_run = "clear tables",
+    packageName = "HivDescriptive",
+    dbms = attr(connection, "dbms"),
+    cohort_database_schema = cohortDatabaseSchema,
+    cohort_attribute_table = "top_n_meds_cohort_attr",
+    attribute_definition_table = "top_n_meds_attr_def",
+    top_n_meds = top_n_meds
+   )
+  executeSql(connection, sql)
+
+
   for (i in 1:nrow(cohorts)) {
     # writeLines(paste("Creating covariates for cohort", cohorts$name[i]))
 
-    # FIGURE OUT WHAT TO DO HERE, LOOP THROUGH COHORTS FOR COVARS? LOOP THROUGH COVARS?
+    sql <- SqlRender::loadRenderTranslateSql(
+      "TopNMedsCohortAttr.sql",
+      block_to_run = "top drug ids",
+      packageName = "HivDescriptive",
+      dbms = attr(connection, "dbms"),
+      cdm_database_schema = cdmDatabaseSchema,
+      cohort_database_schema = cohortDatabaseSchema,
+      cohort_table = "hiv_cohort_table",
+      cohort_attribute_table = "top_n_meds_cohort_attr",
+      attribute_definition_table = "top_n_meds_attr_def",
+      cohort_id = cohorts$cohortId[i],
+      min_cell_count = min_cell_count,
+      row_id_field = row_id_field
+    )
+    cat(sql)
+    res <- querySql(connection, sql)
+    browser()
 
-    # sql <- SqlRender::loadRenderTranslateSql(
-    #   "TopNMedsCohortAttr.sql",
-    #   packageName = "HivDescriptive",
-    #   dbms = attr(connection, "dbms"),
-    #   cdm_database_schema = cdmDatabaseSchema,
-    #   cohort_database_schema = cohortDatabaseSchema,
-    #   cohort_table = "hiv_cohort_table",
-    #   cohort_attribute_table = "top_n_meds_cohort_attr",
-    #   attribute_definition_table = "top_n_meds_attr_def",
-    #   cohort_definition_ids = cohorts$cohortId,
-    #   top_n_meds = top_n_meds,
-    #
-    # )
-    # # cat(sql)
+    # creating custom covarirate from cohort attribute, but can't aggregate:
+    # looCovSet <- createCohortAttrCovariateSettings(attrDatabaseSchema = cohortDatabaseSchema,
+    #                                                cohortAttrTable = "loo_cohort_attr",
+    #                                                attrDefinitionTable = "loo_attr_def")
+
+
+        # # cat(sql)
     # executeSql(connection, sql)
 
     covariates <- getDbCovariateData(connection = connection,
