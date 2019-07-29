@@ -26,7 +26,7 @@
 createCovariates <- function(connection,
                              cohorts = c(), # coming from CohortsToCreate.csv
                              covariateSettings = basicCovariateSettings(),
-                             min_cell_count = 5,
+                             min_cell_count = 11,
                              top_n_meds = 10,
                              row_id_field = "subject_id",
                              cdmDatabaseSchema,
@@ -201,6 +201,7 @@ basicCovariateSettings <- function() {
     useDemographicsRace = TRUE,
     useDemographicsEthnicity = TRUE,
     useConditionOccurrenceAnyTimePrior = TRUE,
+    useConditionOccurrenceLongTerm = TRUE,
     useDrugExposureAnyTimePrior = TRUE,
     useChads2Vasc = TRUE,
     useMeasurementAnyTimePrior = TRUE))

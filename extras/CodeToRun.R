@@ -14,7 +14,7 @@ run <- function() {
   #setwd('./HivDescriptive/')
   source('~/secret/conn.R')
 
-  min_cell_count = 5
+  min_cell_count = 11
   top_n_meds = 10
   cdm_database_schema <- cdmDatabaseSchema <- "onek"
   resultsDatabaseSchema <- cohortDatabaseSchema <- "onek_results"
