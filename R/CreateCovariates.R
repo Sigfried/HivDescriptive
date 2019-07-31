@@ -39,30 +39,23 @@ createCovariates <- function(connection,
                              ) {
 
   looCovSet <- createLooCovariateSettings()
-  #topMedsCovSet <- createTopMedsCovariateSettings()
   # topNMedsCovSet <- createCohortAttrCovariateSettings(attrDatabaseSchema = cohortDatabaseSchema,
   #                                                     cohortAttrTable = "top_n_meds_cohort_attr",
   #                                                     attrDefinitionTable = "top_n_meds_attr_def")
   covariateSettingsList <- list(covariateSettings, looCovSet) #, topMedsCovSet
 
-  sql <- SqlRender::loadRenderTranslateSql(
-    "TopNMedsCohortAttr.sql",
-    block_to_run = "top drug ids",
-    packageName = "HivDescriptive",
-    dbms = attr(connection, "dbms"),
-    cdm_database_schema = cdmDatabaseSchema,
-    cohort_database_schema = cohortDatabaseSchema,
-    cohort_table = "hiv_cohort_table",
-    cohort_attribute_table = "top_n_meds_cohort_attr",
-    attribute_definition_table = "top_n_meds_attr_def",
-    cohort_ids = paste(cohorts$cohortId, collapse = ','),
-    min_cell_count = min_cell_count,
-    row_id_field = row_id_field
-  )
-  cat(sql)
-  res <- querySql(connection, sql) %>% head(top_n_meds) # results like:
-
-  apply(as.array(cohortsToCreate$cohortId), 1, function(id) { id / 2})
+  # sql <- SqlRender::loadRenderTranslateSql(
+  #   "TopNMedsCohortAttr.sql",
+  #   block_to_run = "clear tables",
+  #   packageName = "HivDescriptive",
+  #   dbms = attr(connection, "dbms"),
+  #   cohort_database_schema = cohortDatabaseSchema,
+  #   cohort_attribute_table = "top_n_meds_cohort_attr",
+  #   attribute_definition_table = "top_n_meds_attr_def",
+  #   cohort_ids = paste(cohorts$cohortId, collapse = ','),
+  #   min_cell_count = min_cell_count,
+  #   row_id_field = row_id_field
+  # )
 
   for (i in 1:nrow(cohorts)) {
     # writeLines(paste("Creating covariates for cohort", cohorts$name[i]))
@@ -72,9 +65,37 @@ createCovariates <- function(connection,
     #                                                cohortAttrTable = "loo_cohort_attr",
     #                                                attrDefinitionTable = "loo_attr_def")
 
-
-        # # cat(sql)
-    # executeSql(connection, sql)
+    # couldn't get top_n_med covariates working, giving up for now
+    # sql <- SqlRender::loadRenderTranslateSql(
+    #   "TopNMedsCohortAttr.sql",
+    #   block_to_run = "top drug ids",
+    #   packageName = "HivDescriptive",
+    #   dbms = attr(connection, "dbms"),
+    #   cdm_database_schema = cdmDatabaseSchema,
+    #   cohort_database_schema = cohortDatabaseSchema,
+    #   cohort_table = "hiv_cohort_table",
+    #   cohort_attribute_table = "top_n_meds_cohort_attr",
+    #   attribute_definition_table = "top_n_meds_attr_def",
+    #   # cohort_ids = paste(cohorts$cohortId, collapse = ','),
+    #   cohort_id = cohorts$cohortId[[i]],
+    #   min_cell_count = min_cell_count,
+    #   row_id_field = row_id_field
+    # )
+    # cat(sql)
+    # res <- querySql(connection, sql)
+    # med_settings <- res %>%
+    #   head(top_n_meds) %>%
+    #   select(covariate_id=COVARIATE_ID, covariate_name = COVARIATE_NAME) %>%
+    #   pmap(function(covariate_id, covariate_name) {
+    #     createTopMedCovariateSettings(covariate_id = covariate_id, covariate_name = covariate_name)
+    #   })
+    #
+    #
+    # covariateSettingsList <- med_settings %>%
+    #   prepend(looCovSet) %>%
+    #   prepend(covariateSettings)
+    #
+    # browser()
 
     covariates <- getDbCovariateData(connection = connection,
                                      cdmDatabaseSchema = cdmDatabaseSchema,
@@ -367,7 +388,7 @@ getDbLooCovariateData <- function(connection,
                              analysisId = 1,
                              conceptId = 0)
   covariateRef <- ff::as.ffdf(covariateRef)
-  browser()
+  # browser()
   # Construct analysis reference:
   analysisRef <- data.frame(analysisId = 1,
                             analysisName = "Length of observation",
@@ -387,7 +408,7 @@ getDbLooCovariateData <- function(connection,
   return(result)
 }
 
-createTopMedCovariateSetting <- function(covariate_id = NULL,
+createTopMedCovariateSettings <- function(covariate_id = NULL,
                                          covariate_name = NULL)
 {
   covariateSettings <- list(covariate_id = covariate_id,
@@ -406,8 +427,11 @@ getDbTopMedCovariateData <- function(connection,
                                   rowIdField = "subject_id",
                                   covariateSettings,
                                   aggregated = FALSE) {
+  return(list())
+  stop("stopping in getDbTopMedCovariateData")
   writeLines(paste("Constructing top med covariates:", covariateSettings$covariate_name))
-  if (aggregated)
+  browser()
+  # if (aggregated)
     stop("Aggregation not supported here, use aggregateCovariates()")
   # Some SQL to construct the covariate:
 

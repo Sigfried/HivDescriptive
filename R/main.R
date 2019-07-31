@@ -116,6 +116,22 @@ execute <- function(connectionDetails,
     # }
   }
 
+  browser()
+  results <- pmap(cohortsToCreate,
+                  function(cohortId, name, atlasId) {
+                    customSqlCohortAnalysis(connection = conn,
+                            cdmDatabaseSchema = cdmDatabaseSchema,
+                            cohortDatabaseSchema = cohortDatabaseSchema,
+                            cohortTable = cohortTable,
+                            cohort_id = cohortId,
+                            cohort_name = name,
+                            min_cell_count = min_cell_count,
+                            oracleTempSchema = NULL,
+                            # outputFolder = outputFolder, # should cohort counts end up in export? assuming so for now:
+                            exportFolder = exportFolder)
+                    })
+
+
   vernum <- readLines(pipe("grep '^Version' ./DESCRIPTION"))
   fpath <- file.path(exportFolder, "version.txt")
   write(vernum, fpath)

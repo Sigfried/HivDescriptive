@@ -2,13 +2,10 @@
 File TopNMedsCohortAttr.sql
 ***********************************/
 
-{@block_to_run == 'foo'} ? {
-  SELECT * from @foo;
-}
-
+/*
 {@block_to_run == 'clear tables'} ? {
   /*  requires params: cohort_database_schema, cohort_attribute_table,
-      attribute_definition_table */
+      attribute_definition_table * /
       
   IF OBJECT_ID('@cohort_database_schema.@cohort_attribute_table', 'U') IS NOT NULL
     DROP TABLE @cohort_database_schema.@cohort_attribute_table;
@@ -19,17 +16,18 @@ File TopNMedsCohortAttr.sql
   /* SqlRender not translating these:
   DROP TABLE IF EXISTS @cohort_database_schema.@cohort_attribute_table;
   DROP TABLE IF EXISTS @cohort_database_schema.@attribute_definition_table;
-  */
+  * /
 
   SELECT 1 AS attribute_definition_id,
     'top ' || @top_n_meds || ' drugs' AS attribute_name
   INTO @cohort_database_schema.@attribute_definition_table;
 }
+*/
 
 {DEFAULT @cohort_id = -1}
 {DEFAULT @cohort_ids = -1}
 {@block_to_run == 'top drug ids'} ? {
-  SELECT  de.drug_concept_id,
+  SELECT  de.drug_concept_id covariate_id,
           c.concept_name covariate_name,
           coh.cohort_definition_id,
           COUNT(*) exposure_cnt,
@@ -44,7 +42,7 @@ File TopNMedsCohortAttr.sql
   GROUP BY  coh.cohort_definition_id,
             c.concept_name,
             de.drug_concept_id
-  HAVING COUNT(DISTINCT de.person_id) > @min_cell_count
+  HAVING COUNT(DISTINCT de.person_id) >= @min_cell_count
   ORDER BY  coh.cohort_definition_id,
             COUNT(DISTINCT de.person_id) DESC,
             COUNT(*) DESC,
