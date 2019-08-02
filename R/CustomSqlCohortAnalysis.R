@@ -19,12 +19,13 @@ customSqlCohortAnalysis <- function(connection,
                                     ) {
 
   sql = '
-    SELECT AVG(visit_cnt) avg_visits
+    SELECT AVG(visit_cnt) avg_visits, COUNT(*) cohort_size
     FROM (
           SELECT  coh.@row_id_field,
                   count(*) visit_cnt
           FROM @cohort_database_schema.@cohort_table coh
           LEFT JOIN @cdm_database_schema.visit_occurrence v ON v.person_id = coh.@row_id_field
+          WHERE coh.cohort_definition_id = @cohort_id
           GROUP BY coh.@row_id_field
     ) visits
   '
@@ -38,10 +39,10 @@ customSqlCohortAnalysis <- function(connection,
             row_id_field = row_id_field
           )
   sql <- SqlRender::translate(sql, attr(connection, "dbms"))
-  cat(sql)
+  # cat(sql)
   res <- querySql(connection, sql)
 
-  return(list(avg_visits = res$AVG_VISITS, cohort_id = cohort_id))
+  return(list(cohort_id = cohort_id, cohort_name = cohort_name, avg_visits = res$AVG_VISITS, cohort_size = res$COHORT_SIZE))
 
   # fname <- paste0("covariates.continuous.", cohorts$cohortId[[i]], ".", cohorts$name[[i]], ".csv")
   # fpath <- file.path(exportFolder, fname)

@@ -116,20 +116,20 @@ execute <- function(connectionDetails,
     # }
   }
 
-  browser()
-  results <- pmap(cohortsToCreate,
-                  function(cohortId, name, atlasId) {
-                    customSqlCohortAnalysis(connection = conn,
-                            cdmDatabaseSchema = cdmDatabaseSchema,
-                            cohortDatabaseSchema = cohortDatabaseSchema,
-                            cohortTable = cohortTable,
-                            cohort_id = cohortId,
-                            cohort_name = name,
-                            min_cell_count = min_cell_count,
-                            oracleTempSchema = NULL,
-                            # outputFolder = outputFolder, # should cohort counts end up in export? assuming so for now:
-                            exportFolder = exportFolder)
-                    })
+  results <- pmap_dfr(cohortsToCreate, # technique from https://stackoverflow.com/questions/46899441/row-wise-iteration-like-apply-with-purrr
+                      ~customSqlCohortAnalysis(
+                        connection = conn,
+                        cdmDatabaseSchema = cdmDatabaseSchema,
+                        cohortDatabaseSchema = cohortDatabaseSchema,
+                        cohortTable = cohortTable,
+                        cohort_id = ..1,
+                        cohort_name = ..2,
+                        min_cell_count = min_cell_count,
+                        oracleTempSchema = NULL,
+                        exportFolder = exportFolder))
+
+  fpath <- file.path(exportFolder, "mean_visits_per_person_by_cohort.csv")
+  write.csv(results, fpath, row.names = FALSE)
 
 
   vernum <- readLines(pipe("grep '^Version' ./DESCRIPTION"))
