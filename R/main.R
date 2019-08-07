@@ -79,7 +79,8 @@ execute <- function(connectionDetails,
     conn <- DatabaseConnector::connect(connectionDetails)
   }
 
-  pathToCsv <- system.file("settings", "CohortsToCreate.csv", package = "HivDescriptive")
+  # pathToCsv <- system.file("settings", "CohortsToCreate.csv", package = "HivDescriptive")
+  pathToCsv <- system.file("settings", "CohortsToCreate-ManyForTesting.csv", package = "HivDescriptive")
   cohortsToCreate <- read.csv(pathToCsv)
 
   if (createCohorts) {
@@ -132,13 +133,14 @@ execute <- function(connectionDetails,
   write.csv(results, fpath, row.names = FALSE)
 
 
-  vernum <- readLines(pipe("grep '^Version' ./DESCRIPTION"))
+
+  vernum <- read_file('version.txt')
   fpath <- file.path(exportFolder, "version.txt")
   write(vernum, fpath)
 
 
   #consider removing this later
-  outputFile <- file(paste0(outputFolder, '/outputLog.txt'))
+  outputFile <- file.path(outputFolder, '/outputLog.txt')
 	# OhdsiRTools::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
 
 	if (packageResults) {
