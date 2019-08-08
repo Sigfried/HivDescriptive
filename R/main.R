@@ -79,8 +79,8 @@ execute <- function(connectionDetails,
     conn <- DatabaseConnector::connect(connectionDetails)
   }
 
-  # pathToCsv <- system.file("settings", "CohortsToCreate.csv", package = "HivDescriptive")
-  pathToCsv <- system.file("settings", "CohortsToCreate-ManyForTesting.csv", package = "HivDescriptive")
+  pathToCsv <- system.file("settings", "CohortsToCreate.csv", package = "HivDescriptive")
+  # pathToCsv <- system.file("settings", "CohortsToCreate-ManyForTesting.csv", package = "HivDescriptive")
   cohortsToCreate <- read.csv(pathToCsv)
 
   if (createCohorts) {

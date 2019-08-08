@@ -30,10 +30,10 @@ run <- function() {
   # cdm_database_schema <- cdmDatabaseSchema <- "eunomia"
   # resultsDatabaseSchema <- cohortDatabaseSchema <- "eunomia_results"
 
-  #convention:   resultSchema = cohortDatabaseSchema = workSchema (if we need them for copied code)
   # cdmDatabaseSchema <- "mimic2omop"
   # cohortDatabaseSchema <- "mimic2omop_results"
-  cohortTable <- "hiv_descriptive"
+
+  #convention:   resultSchema = cohortDatabaseSchema = workSchema (if we need them for copied code)
   cohortTable <- "hiv_cohort_table"
 
   outputFolder <- "~/temp/study_results" # c:/temp/study_results"

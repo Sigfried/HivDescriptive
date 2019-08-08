@@ -1,25 +1,23 @@
 Version: 7.0
 
 Current commit
-fe637783e8202665e6858f4b80eadba8491467d6
+2c72b282b0f3e69596260ed9ff0ddc1060d3522b
 
 Current git status
 # On branch custom-covar
-# Your branch is ahead of 'origin/custom-covar' by 1 commit.
-#   (use "git push" to publish your local commits)
-#
-# Changes to be committed:
-#   (use "git reset HEAD <file>..." to unstage)
-#
-#	new file:   current_version_commit_and_state.sh
-#	new file:   version.txt
-#
 # Changes not staged for commit:
 #   (use "git add <file>..." to update what will be committed)
 #   (use "git checkout -- <file>..." to discard changes in working directory)
 #
-#	modified:   DESCRIPTION
+#	modified:   R/CreateCohorts.R
 #	modified:   R/main.R
 #	modified:   extras/CodeToRun.R
+#	modified:   extras/PackageMaintenance.R
+#	modified:   inst/settings/CohortsToCreate.csv
 #	modified:   version.txt
 #
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	R/central_processing.R
+no changes added to commit (use "git add" and/or "git commit -a")
