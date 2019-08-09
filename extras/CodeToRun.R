@@ -107,6 +107,8 @@ unzipdir <- "/export/home/goldss/temp/unzipfiles"
 outputdir <- "/export/home/goldss/temp/central_processing_output"
 
 unlink(unzipdir, recursive = TRUE)
+unlink(outputdir, recursive = TRUE)
+dir.create(outputdir, recursive = TRUE)
 
 site_info <- tibble::tribble(
   ~fname, ~sitename, ~sitename_in_report,
@@ -125,12 +127,14 @@ cp_compare_results <- unzip_and_compare(
   # , ignore_missing_zipfiles = FALSE
   )
 
+
+
 # in order to have the cohort names connected to the cohort ids somewhere in the database:
-# create table CohortsToCreate (cohortId int, atlasId int, name text);
+# create table CohortsToCreate (cohort_id int, atlas_id int, cohort_name text);
 # \copy CohortsToCreate from '/export/home/goldss/projects/HivDescriptive/inst/settings/CohortsToCreate.csv' with csv header;
-# select name, cohortid, count(*), count(distinct subject_id) from hiv_cohort_table_c ct join cohortstocreate cc on ct.cohort_definition_id = cc.cohortid group by 1,2 order by 1;
+# select name, cohort_id, count(*), count(distinct subject_id) from hiv_cohort_table_c ct join cohortstocreate cc on ct.cohort_definition_id = cc.cohort_id group by 1,2 order by 1;
 # +--------------------+----------+-------+-------+
-# |        name        | cohortid | count | count |
+# | cohort_name        | cohort_id| count | count |
 # +--------------------+----------+-------+-------+
 # | AcuteStroke        |  1769043 |    88 |    44 |
 # | AtypicalFF         |   100795 |    26 |    13 |

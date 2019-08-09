@@ -118,16 +118,18 @@ execute <- function(connectionDetails,
   }
 
   results <- pmap_dfr(cohortsToCreate, # technique from https://stackoverflow.com/questions/46899441/row-wise-iteration-like-apply-with-purrr
-                      ~customSqlCohortAnalysis(
-                        connection = conn,
-                        cdmDatabaseSchema = cdmDatabaseSchema,
-                        cohortDatabaseSchema = cohortDatabaseSchema,
-                        cohortTable = cohortTable,
-                        cohort_id = ..1,
-                        cohort_name = ..2,
-                        min_cell_count = min_cell_count,
-                        oracleTempSchema = NULL,
-                        exportFolder = exportFolder))
+                      function(cohort_id, cohort_name, atlas_id)
+                        customSqlCohortAnalysis(
+                          cohort_id,
+                          cohort_name,
+                          connection = conn,
+                          cdmDatabaseSchema = cdmDatabaseSchema,
+                          cohortDatabaseSchema = cohortDatabaseSchema,
+                          cohortTable = cohortTable,
+                          min_cell_count = min_cell_count,
+                          oracleTempSchema = NULL,
+                          exportFolder = exportFolder)) %>%
+    filter(!is.na(avg_visits))
 
   fpath <- file.path(exportFolder, "mean_visits_per_person_by_cohort.csv")
   write.csv(results, fpath, row.names = FALSE)
@@ -192,7 +194,7 @@ execute <- function(connectionDetails,
 # 	#                           cohortTable = paste0(connp$results_schema, '.', studyp$cohort_table))
 # 	#
 # 	# function (connection, oracleTempSchema = NULL, cdmDatabaseSchema,
-# 	#           cohortTable = "#cohort_person", cohortId = -1, cdmVersion = "5",
+# 	#           cohortTable = "#cohort_person", cohort_id = -1, cdmVersion = "5",
 # 	#           rowIdField = "subject_id", covariateSettings, targetDatabaseSchema,
 # 	#           targetCovariateTable, targetCovariateRefTable, targetAnalysisRefTable,
 # 	#           aggregated = FALSE)
@@ -205,7 +207,7 @@ execute <- function(connectionDetails,
 # 	                                     cdmDatabaseSchema = connp$schema,
 # 	                                     cohortDatabaseSchema = connp$results_schema,
 # 	                                     cohortTable = cohortTable,
-# 	                                     cohortId = 1, #target_cohort_id,
+# 	                                     cohort_id = 1, #target_cohort_id,
 # 	                                     #rowIdField = "subject_id", # sometimes uncommenting this is necessary, but not always
 # 	                                     # aggregated = TRUE,
 # 	                                     # covariateSettings = covariateSettings
@@ -264,7 +266,7 @@ execute <- function(connectionDetails,
   #   totalCountSql <- SqlRender::loadRenderTranslateSql(sqlFilename = "TotalCount.sql",
   #                                                      packageName = packageName(),
   #                                                      dbms = attr(conn, "dbms"),
-  #                                                      cohortId = cohortsCsv$cohortId[i],
+  #                                                      cohort_id = cohortsCsv$cohort_id[i],
   #                                                      target_database_schema = targetDatabaseSchema,
   #                                                      target_cohort_table = cohortTable)
   #   totalCount <- DatabaseConnector::querySql(conn, totalCountSql);
@@ -280,7 +282,7 @@ execute <- function(connectionDetails,
   #                                                        packageName = packageName(),
   #                                                        dbms = attr(conn, "dbms"),
   #                                                        CDM_schema = cdmDatabaseSchema,
-  #                                                        cohortId = cohortsCsv$cohortId[i],
+  #                                                        cohort_id = cohortsCsv$cohort_id[i],
   #                                                        target_database_schema = targetDatabaseSchema,
   #                                                        target_cohort_table = cohortTable)
   #   dePriorCount <- DatabaseConnector::querySql(conn, dePriorCountSql);
@@ -295,7 +297,7 @@ execute <- function(connectionDetails,
   #                                                        packageName = packageName(),
   #                                                        dbms = attr(conn, "dbms"),
   #                                                        CDM_schema = cdmDatabaseSchema,
-  #                                                        cohortId = cohortsCsv$cohortId[i],
+  #                                                        cohort_id = cohortsCsv$cohort_id[i],
   #                                                        target_database_schema = targetDatabaseSchema,
   #                                                        target_cohort_table = cohortTable)
   #   coPriorCount <- DatabaseConnector::querySql(conn, coPriorCountSql);
@@ -310,7 +312,7 @@ execute <- function(connectionDetails,
   #                                                     packageName = packageName(),
   #                                                     dbms = attr(conn, "dbms"),
   #                                                     CDM_schema = cdmDatabaseSchema,
-  #                                                     cohortId = cohortsCsv$cohortId[i],
+  #                                                     cohort_id = cohortsCsv$cohort_id[i],
   #                                                     target_database_schema = targetDatabaseSchema,
   #                                                     target_cohort_table = cohortTable)
   #   drugCount <- DatabaseConnector::querySql(conn, drugCountSql);
@@ -325,7 +327,7 @@ execute <- function(connectionDetails,
   #                                                          packageName = packageName(),
   #                                                          dbms = attr(conn, "dbms"),
   #                                                          CDM_schema = cdmDatabaseSchema,
-  #                                                          cohortId = cohortsCsv$cohortId[i],
+  #                                                          cohort_id = cohortsCsv$cohort_id[i],
   #                                                          target_database_schema = targetDatabaseSchema,
   #                                                          target_cohort_table = cohortTable)
   #   conditionCount <- DatabaseConnector::querySql(conn, conditionCountSql);
@@ -340,7 +342,7 @@ execute <- function(connectionDetails,
   #                                                        packageName = packageName(),
   #                                                        dbms = attr(conn, "dbms"),
   #                                                        CDM_schema = cdmDatabaseSchema,
-  #                                                        cohortId = cohortsCsv$cohortId[i],
+  #                                                        cohort_id = cohortsCsv$cohort_id[i],
   #                                                        target_database_schema = targetDatabaseSchema,
   #                                                        target_cohort_table = cohortTable)
   #   erVisitCount <- DatabaseConnector::querySql(conn, erVisitCountSql);

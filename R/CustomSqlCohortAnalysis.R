@@ -2,7 +2,9 @@
 #'
 #'
 #' @export
-customSqlCohortAnalysis <- function(connection,
+customSqlCohortAnalysis <- function(cohort_id,
+                                    cohort_name,
+                                    connection,
                                     cohorts = c(), # coming from CohortsToCreate.csv
                                     covariateSettings = basicCovariateSettings(),
                                     min_cell_count = 11,
@@ -12,8 +14,6 @@ customSqlCohortAnalysis <- function(connection,
                                     vocabularyDatabaseSchema = cdmDatabaseSchema,
                                     cohortDatabaseSchema,
                                     cohortTable,
-                                    cohort_id,
-                                    cohort_name,
                                     oracleTempSchema,
                                     exportFolder
                                     ) {
@@ -44,13 +44,13 @@ customSqlCohortAnalysis <- function(connection,
 
   return(list(cohort_id = cohort_id, cohort_name = cohort_name, avg_visits = res$AVG_VISITS, cohort_size = res$COHORT_SIZE))
 
-  # fname <- paste0("covariates.continuous.", cohorts$cohortId[[i]], ".", cohorts$name[[i]], ".csv")
+  # fname <- paste0("covariates.continuous.", cohorts$cohort_id[[i]], ".", cohorts$cohort_name[[i]], ".csv")
   # fpath <- file.path(exportFolder, fname)
   # write.csv(result, fpath, row.names = FALSE)
-  # fname <- paste0("table1.", cohorts$cohortId[[i]], ".", cohorts$name[[i]], ".csv")
+  # fname <- paste0("table1.", cohorts$cohort_id[[i]], ".", cohorts$cohort_name[[i]], ".csv")
   # fpath <- file.path(exportFolder, fname)
   # write.csv(result, fpath, row.names = FALSE)
   # writeLines(paste0("Wrote covariates to ", exportFolder,"/", fname))
-  # # writeLines(paste0('0 population in ', cohorts$name[[i]]))
+  # # writeLines(paste0('0 population in ', cohorts$cohort_name[[i]]))
 }
 

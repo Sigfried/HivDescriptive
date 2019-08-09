@@ -1,4 +1,4 @@
-cohortId,atlasId,name
+cohort_id,atlas_id,cohort_name
 1769961,1769961,Male50plus
 1769440,1769440,HIV_Patient
 1770612,1770612,HIV_patient_by_LOINC_codes

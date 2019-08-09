@@ -47,7 +47,14 @@ unzip_and_compare <- function(zipdir = zipdir,
     mutate(cohort = paste0(cohortName, ":", cohortDefinitionId))
 
 
+  sites_by_cohort <- cnts %>% group_by(cohort) %>% do(sites = paste0(.data$site, collapse = ', ')) %>% mutate(sites = unlist(sites))
+  cohorts_by_site <- cnts %>% group_by(site) %>% do(cohorts = paste0(.data$cohort, collapse = ', ')) %>% mutate(cohorts = unlist(cohorts))
+
+  cnts <- cnts %>% select(site, cohort, count)
+  write_csv(cnts, file.path(outputdir, "CohortCounts.csv"))
+
   print("so far so good")
+  return()
 }
 
 unzip_site_files <- function(fname, sitename_in_report, zipdir, unzipdir) {
@@ -58,9 +65,3 @@ unzip_site_files <- function(fname, sitename_in_report, zipdir, unzipdir) {
   return(list(sitename_in_report = sitename_in_report, exdir = exdir))
 }
 
-get_counts <- function(sitename_in_report, exdir) {
-  ccfname <- "CohortCounts.csv"
-  cc <- read_csv(file.path(exdir, ccfname))
-  cc$site <- sitename_in_report
-  return(list(site = sitename_in_report, cc = cc))
-}

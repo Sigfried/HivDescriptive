@@ -52,13 +52,13 @@ createCovariates <- function(connection,
   #   cohort_database_schema = cohortDatabaseSchema,
   #   cohort_attribute_table = "top_n_meds_cohort_attr",
   #   attribute_definition_table = "top_n_meds_attr_def",
-  #   cohort_ids = paste(cohorts$cohortId, collapse = ','),
+  #   cohort_ids = paste(cohorts$cohort_id, collapse = ','),
   #   min_cell_count = min_cell_count,
   #   row_id_field = row_id_field
   # )
 
   for (i in 1:nrow(cohorts)) {
-    # writeLines(paste("Creating covariates for cohort", cohorts$name[i]))
+    # writeLines(paste("Creating covariates for cohort", cohorts$cohort_name[i]))
 
     # creating custom covarirate from cohort attribute, but can't aggregate:
     # looCovSet <- createCohortAttrCovariateSettings(attrDatabaseSchema = cohortDatabaseSchema,
@@ -76,8 +76,8 @@ createCovariates <- function(connection,
     #   cohort_table = "hiv_cohort_table",
     #   cohort_attribute_table = "top_n_meds_cohort_attr",
     #   attribute_definition_table = "top_n_meds_attr_def",
-    #   # cohort_ids = paste(cohorts$cohortId, collapse = ','),
-    #   cohort_id = cohorts$cohortId[[i]],
+    #   # cohort_ids = paste(cohorts$cohort_id, collapse = ','),
+    #   cohort_id = cohorts$cohort_id[[i]],
     #   min_cell_count = min_cell_count,
     #   row_id_field = row_id_field
     # )
@@ -95,13 +95,12 @@ createCovariates <- function(connection,
     #   prepend(looCovSet) %>%
     #   prepend(covariateSettings)
     #
-    # browser()
 
     covariates <- getDbCovariateData(connection = connection,
                                      cdmDatabaseSchema = cdmDatabaseSchema,
                                      cohortDatabaseSchema = cohortDatabaseSchema,
                                      cohortTable = "hiv_cohort_table",
-                                     cohortId = cohorts$cohortId[i],
+                                     cohortId = cohorts$cohort_id[i],
                                      covariateSettings = covariateSettingsList,
                                      aggregated = FALSE
     )
@@ -130,7 +129,7 @@ createCovariates <- function(connection,
           dplyr::left_join(aaref) %>%
           dplyr::group_by(analysisId) %>%
           dplyr::top_n(min_cell_count, sumValue) %>% dplyr::arrange(analysisName, -sumValue)
-        fname <- paste0("covariates.", cohorts$cohortId[[i]], ".", cohorts$name[[i]], ".csv")
+        fname <- paste0("covariates.", cohorts$cohort_id[[i]], ".", cohorts$cohort_name[[i]], ".csv")
         fpath <- file.path(exportFolder, fname)
         write.csv(result, fpath, row.names = FALSE)
 
@@ -140,7 +139,7 @@ createCovariates <- function(connection,
           dplyr::left_join(acvref) %>%
           dplyr::left_join(aaref) %>%
           dplyr::group_by(analysisId)
-        fname <- paste0("covariates.continuous.", cohorts$cohortId[[i]], ".", cohorts$name[[i]], ".csv")
+        fname <- paste0("covariates.continuous.", cohorts$cohort_id[[i]], ".", cohorts$cohort_name[[i]], ".csv")
         fpath <- file.path(exportFolder, fname)
         write.csv(result, fpath, row.names = FALSE)
       }
@@ -148,12 +147,12 @@ createCovariates <- function(connection,
         result <- createTable1(aggcovariates,
                                specifications = getDefaultTable1Specifications(),
                                output = "one column")
-        fname <- paste0("table1.", cohorts$cohortId[[i]], ".", cohorts$name[[i]], ".csv")
+        fname <- paste0("table1.", cohorts$cohort_id[[i]], ".", cohorts$cohort_name[[i]], ".csv")
         fpath <- file.path(exportFolder, fname)
         write.csv(result, fpath, row.names = FALSE)
       }
-      # result$cohortId <- cohorts$cohortId[[i]]
-      # result$cohortName <- toString(cohorts$name[[i]])
+      # result$cohort_id <- cohorts$cohort_id[[i]]
+      # result$cohortName <- toString(cohorts$cohort_name[[i]])
 
       writeLines(paste0("Wrote covariates to ", exportFolder,"/", fname))
 
@@ -168,7 +167,7 @@ createCovariates <- function(connection,
       #   result <- rbind(result, cresult)
       # }
     } else{
-      writeLines(paste0('0 population in ', cohorts$name[[i]]))
+      writeLines(paste0('0 population in ', cohorts$cohort_name[[i]]))
     }
   }
 }
@@ -181,8 +180,8 @@ createCovariates <- function(connection,
     # sql <- SqlRender::translate(sql, targetDialect = attr(connection, "dbms"))
     # counts <- DatabaseConnector::querySql(connection, sql)
     # names(counts) <- SqlRender::snakeCaseToCamelCase(names(counts))
-    # counts <- merge(counts, data.frame(cohortDefinitionId = cohortsToCreate$cohortId,
-    #                                    cohortName  = cohortsToCreate$name))
+    # counts <- merge(counts, data.frame(cohortDefinitionId = cohortsToCreate$cohort_id,
+    #                                    cohortName  = cohortsToCreate$cohort_name))
     # write.csv(counts, file.path(outputFolder, "CohortCounts.csv"), row.names = FALSE)
     # writeLines(paste0("Wrote cohort counts to ", outputFolder,"/CohortCounts.csv"))
 
@@ -194,7 +193,7 @@ createCovariates <- function(connection,
   #   cdmDatabaseSchema = cdmDatabaseSchema,
   #   cohortDatabaseSchema = resultsDatabaseSchema,
   #   cohortTable = cohortTable,
-  #   cohortId = 1769961,
+  #   cohort_id = 1769961,
   #   rowIdField = "subject_id",
   #   covariateSettings = covariateSettings)
   # covariateData2 <- aggregateCovariates(covariateData)
@@ -408,97 +407,97 @@ getDbLooCovariateData <- function(connection,
   return(result)
 }
 
-createTopMedCovariateSettings <- function(covariate_id = NULL,
-                                         covariate_name = NULL)
-{
-  covariateSettings <- list(covariate_id = covariate_id,
-                            covariate_name = covariate_name)
-  attr(covariateSettings, "fun") <- "getDbTopMedCovariateData"
-  class(covariateSettings) <- "covariateSettings"
-  return(covariateSettings)
-}
+# createTopMedCovariateSettings <- function(covariate_id = NULL,
+#                                          covariate_name = NULL)
+# {
+#   covariateSettings <- list(covariate_id = covariate_id,
+#                             covariate_name = covariate_name)
+#   attr(covariateSettings, "fun") <- "getDbTopMedCovariateData"
+#   class(covariateSettings) <- "covariateSettings"
+#   return(covariateSettings)
+# }
 
-getDbTopMedCovariateData <- function(connection,
-                                  oracleTempSchema = NULL,
-                                  cdmDatabaseSchema,
-                                  cohortTable = "#cohort_person",
-                                  cohortId = -1,
-                                  cdmVersion = "5",
-                                  rowIdField = "subject_id",
-                                  covariateSettings,
-                                  aggregated = FALSE) {
-  return(list())
-  stop("stopping in getDbTopMedCovariateData")
-  writeLines(paste("Constructing top med covariates:", covariateSettings$covariate_name))
-  browser()
-  # if (aggregated)
-    stop("Aggregation not supported here, use aggregateCovariates()")
-  # Some SQL to construct the covariate:
-
-
-  # sql <- paste("WITH cohort_drugs AS (",
-  #              "  SELECT @row_id_field AS row_id, ",
-  #              "          2 AS covariate_id, ",
-  #              "          de.drug_concept_id",
-  #              "  FROM @cohort_table c ",
-  #              "  INNER JOIN @cdm_database_schema.drug_exposure de ON de.person_id = c.subject_id ",
-  #              "  WHERE cohort_start_date <= de.drug_exposure_start_date AND ",
-  #              "        cohort_end_date >= de.drug_exposure_startsla_date AND ",
-  #              "        {@cohort_id != -1} ? {AND cohort_definition_id = @cohort_id}",
-  #              ")",
-  #              "SELECT drug_concept_id, count(*) cnt",
-  #              "FROM cohort_drugs",
-  #              "GROUP BY 1",     #   fix to not be postgres specific!!!!!!
-  #              "HAVING count(*) >= @min_cell_count",
-  #              "ORDER by 2 DESC",
-  #              "LIMIT @top_n_meds",
-  #              "SELECT c.concept_name as drug_name, cd.row_id, count(*) cnt",
-  #              "FROM (",
-  #              "  SELECT drug_concept_id, count(*) cnt",
-  #              "  FROM cohort_drugs",
-  #              "  GROUP BY 1",
-  #              "  HAVING count(*) >= @min_cell_count",
-  #              "  ORDER by 2 DESC",
-  #              "  LIMIT @top_n_meds",
-  #              ") topdrugs",
-  #              "INNER JOIN cohort_drugs cd ON topdrugs.drug_concept_id = cd.drug_concept_id",
-  #              "INNER JOIN @cdm_database_schema.concept c ON topdrugs.drug_concept_id = c.concept_id",
-  #              "GROUP BY 1,2")
-  # sql <- SqlRender::render(sql,
-  #                          cohort_table = cohortTable,
-  #                          cohort_id = cohortId,
-  #                          row_id_field = rowIdField,
-  #                          cdm_database_schema = cdmDatabaseSchema,
-  #                          min_cell_count = covariateSettings$min_cell_count,
-  #                          top_n_meds = covariateSettings$top_n_meds)
-  # sql <- SqlRender::translate(sql, targetDialect = attr(connection, "dbms"))
-  # writeLines('top meds sql:')
-  # writeLines(sql)
-  # Retrieve the covariate:
-  covariates <- DatabaseConnector::querySql.ffdf(connection, sql)
-  # Convert colum names to camelCase:
-  colnames(covariates) <- SqlRender::snakeCaseToCamelCase(colnames(covariates))
-  # Construct covariate reference:
-  covariateRef <- data.frame(covariateId = 1,
-                             covariateName = "whoops",    #    this is going to be multiple covariates, isn't it?
-                             analysisId = 1,
-                             conceptId = 0)
-  covariateRef <- ff::as.ffdf(covariateRef)
-  # Construct analysis reference:
-  analysisRef <- data.frame(analysisId = 1,
-                            analysisName = "Length of observation",
-                            domainId = "Demographics",
-                            startDay = 0,
-                            endDay = 0,
-                            isBinary = "N",
-                            missingMeansZero = "Y")
-  analysisRef <- ff::as.ffdf(analysisRef)
-  # Construct analysis reference:
-  metaData <- list(sql = sql, call = match.call())
-  result <- list(covariates = covariates,
-                 covariateRef = covariateRef,
-                 analysisRef = analysisRef,
-                 metaData = metaData)
-  class(result) <- "covariateData"
-  return(result)
-}
+# getDbTopMedCovariateData <- function(connection,
+#                                   oracleTempSchema = NULL,
+#                                   cdmDatabaseSchema,
+#                                   cohortTable = "#cohort_person",
+#                                   cohortId = -1,
+#                                   cdmVersion = "5",
+#                                   rowIdField = "subject_id",
+#                                   covariateSettings,
+#                                   aggregated = FALSE) {
+#   return(list())
+#   stop("stopping in getDbTopMedCovariateData")
+#   writeLines(paste("Constructing top med covariates:", covariateSettings$covariate_name))
+#   browser()
+#   # if (aggregated)
+#     stop("Aggregation not supported here, use aggregateCovariates()")
+#   # Some SQL to construct the covariate:
+#
+#
+#   # sql <- paste("WITH cohort_drugs AS (",
+#   #              "  SELECT @row_id_field AS row_id, ",
+#   #              "          2 AS covariate_id, ",
+#   #              "          de.drug_concept_id",
+#   #              "  FROM @cohort_table c ",
+#   #              "  INNER JOIN @cdm_database_schema.drug_exposure de ON de.person_id = c.subject_id ",
+#   #              "  WHERE cohort_start_date <= de.drug_exposure_start_date AND ",
+#   #              "        cohort_end_date >= de.drug_exposure_startsla_date AND ",
+#   #              "        {@cohort_id != -1} ? {AND cohort_definition_id = @cohort_id}",
+#   #              ")",
+#   #              "SELECT drug_concept_id, count(*) cnt",
+#   #              "FROM cohort_drugs",
+#   #              "GROUP BY 1",     #   fix to not be postgres specific!!!!!!
+#   #              "HAVING count(*) >= @min_cell_count",
+#   #              "ORDER by 2 DESC",
+#   #              "LIMIT @top_n_meds",
+#   #              "SELECT c.concept_name as drug_name, cd.row_id, count(*) cnt",
+#   #              "FROM (",
+#   #              "  SELECT drug_concept_id, count(*) cnt",
+#   #              "  FROM cohort_drugs",
+#   #              "  GROUP BY 1",
+#   #              "  HAVING count(*) >= @min_cell_count",
+#   #              "  ORDER by 2 DESC",
+#   #              "  LIMIT @top_n_meds",
+#   #              ") topdrugs",
+#   #              "INNER JOIN cohort_drugs cd ON topdrugs.drug_concept_id = cd.drug_concept_id",
+#   #              "INNER JOIN @cdm_database_schema.concept c ON topdrugs.drug_concept_id = c.concept_id",
+#   #              "GROUP BY 1,2")
+#   # sql <- SqlRender::render(sql,
+#   #                          cohort_table = cohortTable,
+#   #                          cohort_id = cohortId,
+#   #                          row_id_field = rowIdField,
+#   #                          cdm_database_schema = cdmDatabaseSchema,
+#   #                          min_cell_count = covariateSettings$min_cell_count,
+#   #                          top_n_meds = covariateSettings$top_n_meds)
+#   # sql <- SqlRender::translate(sql, targetDialect = attr(connection, "dbms"))
+#   # writeLines('top meds sql:')
+#   # writeLines(sql)
+#   # Retrieve the covariate:
+#   covariates <- DatabaseConnector::querySql.ffdf(connection, sql)
+#   # Convert colum names to camelCase:
+#   colnames(covariates) <- SqlRender::snakeCaseToCamelCase(colnames(covariates))
+#   # Construct covariate reference:
+#   covariateRef <- data.frame(covariateId = 1,
+#                              covariateName = "whoops",    #    this is going to be multiple covariates, isn't it?
+#                              analysisId = 1,
+#                              conceptId = 0)
+#   covariateRef <- ff::as.ffdf(covariateRef)
+#   # Construct analysis reference:
+#   analysisRef <- data.frame(analysisId = 1,
+#                             analysisName = "Length of observation",
+#                             domainId = "Demographics",
+#                             startDay = 0,
+#                             endDay = 0,
+#                             isBinary = "N",
+#                             missingMeansZero = "Y")
+#   analysisRef <- ff::as.ffdf(analysisRef)
+#   # Construct analysis reference:
+#   metaData <- list(sql = sql, call = match.call())
+#   result <- list(covariates = covariates,
+#                  covariateRef = covariateRef,
+#                  analysisRef = analysisRef,
+#                  metaData = metaData)
+#   class(result) <- "covariateData"
+#   return(result)
+# }
