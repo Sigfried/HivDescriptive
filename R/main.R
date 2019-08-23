@@ -128,8 +128,8 @@ execute <- function(connectionDetails,
                           cohortTable = cohortTable,
                           min_cell_count = min_cell_count,
                           oracleTempSchema = NULL,
-                          exportFolder = exportFolder)) %>%
-    filter(!is.na(avg_visits))
+                          exportFolder = exportFolder))
+  # %>% filter(!is.na(avg_visits))
 
   fpath <- file.path(exportFolder, "mean_visits_per_person_by_cohort.csv")
   write.csv(results, fpath, row.names = FALSE)
