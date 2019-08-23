@@ -1,69 +1,88 @@
-library(DatabaseConnector)
 library(SqlRender)
-library(tidyverse)
 library(FeatureExtraction)
-library(HivDescriptive)
+library(tidyverse)
 
-# set your db, server, port, user and password,
-readRenviron('./.env')
-
-# studyp: config var for params related to this study and package but not to the db connection
-studyp <- list(
-  tablePrefix = "HivDescriptive_",
-  outputFolder = getwd(), # Sys.getenv('OUTPUT_FOLDER') # /tmp/study_results
-  packageName = "HivDescriptive"
-)
-studyp$cohort_table = paste0(studyp$tablePrefix, "cohort")
-
-
-# from https://github.com/OHDSI/StudyProtocols/blob/master/AlendronateVsRaloxifene/extras/CodeToRun.R
-remove.packages('HivDescriptive')
-setwd("/export/home/goldss/projects/")
-library(devtools)
-install('HivDescriptive')
-
+# remove.packages('HivDescriptive')
+# setwd("/export/home/goldss/projects/")
+# library(devtools)
+# install_local('HivDescriptive')
 library(HivDescriptive)
 
 
+run <- function() {
+  #setwd('./HivDescriptive/')
+  source('~/secret/conn.R')
+
+  cdm_database_schema <- cdmDatabaseSchema <- "onek"
+  resultsDatabaseSchema <- cohortDatabaseSchema <- "onek_results"
+  #convention:   resultSchema = cohortDatabaseSchema = workSchema (if we need them for copied code)
+  # cdmDatabaseSchema <- "mimic2omop"
+  # cohortDatabaseSchema <- "mimic2omop_results"
+  cohortTable <- "hiv_descriptive"
+  cohortTable <- "hiv_cohort_table"
+
+  outputFolder <- "~/temp/study_results" # c:/temp/study_results"
+  unlink(outputFolder, recursive = TRUE)
+
+  connectionDetails <- createConnectionDetails(dbms = dbms,
+                                               user = user,
+                                               password = pw,
+                                               server = server,
+                                               port = port,
+                                               schema = cdmDatabaseSchema)
+  connection <- DatabaseConnector::connect(connectionDetails)
+
+  covariates <- HivDescriptive::execute(connectionDetails = connectionDetails,
+                                        conn = connection,
+                                        cdmDatabaseSchema = cdmDatabaseSchema,
+                                        cohortDatabaseSchema = cohortDatabaseSchema,
+                                        cohortTable = cohortTable,
+                                        oracleTempSchema = NULL,
+                                        outputFolder = outputFolder,
+                                        createCohorts = TRUE,
+                                        createCovariates = TRUE,
+                                        covariateSettings = HivDescriptive::maxCovariateSettings(),
+                                        covarOutput = c("table1", "big.data.frame"),
+                                        packageResults = TRUE
+                                        # return = "covariates" # or "conn" or nothing
+  )
+  return(connection)
+}
+connection <- run()
+DatabaseConnector::disconnect(connection)
+
+# in order to have the cohort names connected to the cohort ids somewhere in the database:
+# create table CohortsToCreate (cohortId int, atlasId int, name text);
+# \copy CohortsToCreate from '/export/home/goldss/projects/HivDescriptive/inst/settings/CohortsToCreate.csv' with csv header;
+# select name, cohortid, count(*), count(distinct subject_id) from hiv_cohort_table_c ct join cohortstocreate cc on ct.cohort_definition_id = cc.cohortid group by 1,2 order by 1;
+# +--------------------+----------+-------+-------+
+# |        name        | cohortid | count | count |
+# +--------------------+----------+-------+-------+
+# | AcuteStroke        |  1769043 |    88 |    44 |
+# | AtypicalFF         |   100795 |    26 |    13 |
+# | HIV_by_1_SNOMED_Dx |  1770614 |    78 |    39 |
+# | HIV_Patient        |  1769440 |    78 |    39 |
+# | Male50plus         |  1769961 |   916 |   458 |
+# | NoHipVertFx        |   100792 |    32 |    16 |
+# | OsteonecrosisOfJaw |   100793 |    44 |    22 |
+# | Thromboembolism    |  1769024 |   440 |   220 |
+# +--------------------+----------+-------+-------+
 
 
-
-# since connectionDetail doesn't accept more than one schema param
-#   or other params we need later, store those in 'connp'
-# 'connectionDetails' will only be used for  creating connections, not
-# for referencing connection-related parameters as has been the convention
-# in other DatabaseConnector-based studies
-connp <- list(dbms = "postgresql",
-              server = paste0(Sys.getenv("PGHOST"),'/',
-                            Sys.getenv('PGDATABASE')),
-              port = coalesce(na_if(Sys.getenv("PGPORT"), ""), "5432"),
-              user = Sys.getenv('PGUSER'),
-              password = Sys.getenv('PGPASSWORD'),
-              schema = Sys.getenv('CDM_SCHEMA'),
-              vocab_schema = Sys.getenv('VOCAB_SCHEMA'),
-              results_schema = Sys.getenv('RESULTS_SCHEMA')
-)
+# getTableNames(conn, cohortDatabaseSchema)
 
 
-connectionDetails <- do.call(
-  createConnectionDetails,
-  connp[c("dbms","server","port","user","password","schema")])
-conn <- connect(connectionDetails)
-
-HivDescriptive::init(connectionDetails = connectionDetails,
-                   targetDatabaseSchema = connp$results_schema,
-                   tablePrefix = studyp$tablePrefix)
-
-# use as example now: https://github.com/OHDSI/StudyProtocols/tree/master/KeppraAngioedema
+# write this into the export folder and tag release!!
 
 
-HivDescriptive::execute(connectionDetails = connectionDetails,
-                        connp = connp,
-                        studyp = studyp,
-                        outputFolder = studyp$outputFolder,
-                        studyp$tablePrefix,
-                        cohortTable = studyp$cohort_table)
+# VH troubleshooting
+# oracleTempSchema = NULL
+# #disconnect(connection)
+# connection <- DatabaseConnector::connect(connectionDetails)
+#
+# DatabaseConnector::getTableNames(connection,databaseSchema = cdmDatabaseSchema)
+#
+# DatabaseConnector::getTableNames(connection,databaseSchema = cohortDatabaseSchema)
 
-
-
-OhdsiRTools::insertEnvironmentSnapshotInPackage(studyp$packageName)
+# not sure what the next line was for. keeping it (commented out) in case it was something we should put back in
+#OhdsiRTools::insertEnvironmentSnapshotInPackage(studyp$packageName)

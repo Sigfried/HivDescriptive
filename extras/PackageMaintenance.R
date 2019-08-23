@@ -14,28 +14,49 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-library(tidyverse)
-readRenviron('.env')
+
+#devtools::install_github("OHDSI/OhdsiSharing",args="--no-multiarch" )
 
 # add more cohort defs at some point:
 #   HIV patients when HIV onset > age 18
 #   patients with HIV lab test (temporarily use any, ldl measure table record)
 
+# cohorts loading from public ATLAS server:
+
+# cohortId,atlasId,name
+# 1769961,1769961,Male50plus
+# 1769440,1769440,HIV_Patient
+# 1770612,1770612,HIV_patient_by_LOINC_codes
+# 99321,99321,Alendronate
+# 99322,99322,Raloxifene
+# 99323,99323,HipFracture
+# 100792,100792,NoHipVertFx
+# 100791,100791,VertebralFracture
+# 100793,100793,OsteonecrosisOfJaw
+# 100794,100794,EsophagealCancer
+# 100795,100795,AtypicalFF
+# 1769024,1769024,Thromboembolism
+# 1769043,1769043,AcuteStroke%
+
+# things start breaking in CreateCohorts when this one is added:
+# 1770614,1770614,HIV_by_1_SNOMED_Dx    # SG, 6/12/2019: this isn't breaking things anymore. not sure why
+
 # Insert cohort definitions from ATLAS into package -----------------------
 OhdsiRTools::insertCohortDefinitionSetInPackage(fileName = "CohortsToCreate.csv",
-                                                baseUrl = Sys.getenv("WebAPIBaseUrl"),# "http://18.213.176.21:80/WebAPI",
+                                                baseUrl = "http://18.213.176.21:80/WebAPI",
                                                 insertTableSql = TRUE,
-                                                insertCohortCreationR = TRUE,
+                                                insertCohortCreationR = FALSE, #TRUE,
                                                 generateStats = FALSE,
                                                 packageName = 'HivDescriptive'
                                                 )
+# Error in readChar(fileName, file.info(fileName)$size) :
+#   invalid 'nchars' argument
+# In addition: Warning message:
+#   In file(con, "rb") :
+#   file("") only supports open = "w+" and open = "w+b": using the former
+
 # command above produces error but seems to work. it creates the right files. To do them one by
 #   one without error messages, use commands below
-        # Error in readChar(fileName, file.info(fileName)$size) :
-        #   invalid 'nchars' argument
-        # In addition: Warning message:
-        #   In file(con, "rb") :
-        #   file("") only supports open = "w+" and open = "w+b": using the former
 
 # OhdsiRTools::insertCohortDefinitionInPackage(
 #   definitionId = 1769961,
@@ -51,4 +72,4 @@ OhdsiRTools::insertCohortDefinitionSetInPackage(fileName = "CohortsToCreate.csv"
 #   generateStats = FALSE
 # )
 
-FeatureExtraction::createAnalysisDetails()
+#FeatureExtraction::createAnalysisDetails()

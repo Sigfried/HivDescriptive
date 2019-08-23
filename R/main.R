@@ -14,47 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#' Initialize HivDescriptive Tables
-#'
-#' @details
-#' This function initializes the HivDescriptive Study tables.
-#'
-#' @param connectionDetails    An object of type \code{connectionDetails} as created using the
-#'                             \code{\link[DatabaseConnector]{createConnectionDetails}} function in the
-#'                             DatabaseConnector package.
-#' @param targetDatabaseSchema The schema to contain the study results tables
-#'
-#' @param tablePrefix          A prefix to add to the study tables
-#'
-#' @examples
-#' \dontrun{
-#' connectionDetails <- DatatbaseConnector:: createConnectionDetails(dbms = "postgresql",
-#'                                              user = "joe",
-#'                                              password = "secret",
-#'                                              server = "myserver")
-#'
-#' execute(connectionDetails,
-#'         targetDatabaseSchema = "studyDB.endoStudy",
-#'         tablePrefix="endo_")
-#' }
-#'
-#' @export
-init <- function(connectionDetails, targetDatabaseSchema, tablePrefix="") {
 
-	conn <- DatabaseConnector::connect(connectionDetails);
-
-	# Create study cohort table structure:
-	sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "CreateCohortTable.sql",
-																					 packageName = packageName(),
-																					 dbms = attr(conn, "dbms"),
-																					 cohort_database_schema = targetDatabaseSchema,
-																					 cohort_table = paste0(tablePrefix, "cohort"))
-
-	DatabaseConnector::executeSql(conn, sql, progressBar = TRUE, reportOverallTime = FALSE)
-	DatabaseConnector::dbDisconnect(conn);
-
-	invisible(NULL)
-}
 
 #' Execute HivDescriptive Study
 #'
@@ -91,141 +51,172 @@ init <- function(connectionDetails, targetDatabaseSchema, tablePrefix="") {
 #'
 #' @export
 execute <- function(connectionDetails,
-										connp, studyp,
-										tablePrefix = "",
-										outputFolder,
-										createCohorts = TRUE,
-										cohortTable
-) {
+                    conn = NULL,
+                    cdmDatabaseSchema,
+                    cohortDatabaseSchema,
+                    cohortTable = 'hiv_cohort',  #consider removing the prefixes for cohort table
+                    createCohorts = TRUE,
+                    covariateSettings = NULL,
+                    createCovariates = TRUE,
+                    covarOutput = c(), # 'big.data.frame', # or 'table1'
+                    oracleTempSchema = NULL,
+                    outputFolder,
+                    packageResults = TRUE,
+                    return = '') {
+  #1. prepare folder, and create cohorts
+  #outputFolder <- studyp$outputFolder
 	if (!file.exists(outputFolder))
 		dir.create(outputFolder, recursive = TRUE)
 
+  #create export folder
+  exportFolder <- file.path(outputFolder, "export")
+  if (!file.exists(exportFolder))
+    dir.create(exportFolder)
+
+  if (is.null(conn)) {
+    conn <- DatabaseConnector::connect(connectionDetails)
+  }
+
+  pathToCsv <- system.file("settings", "CohortsToCreate.csv", package = "HivDescriptive")
+  cohortsToCreate <- read.csv(pathToCsv)
+
+  if (createCohorts) {
+    createCohorts(connection = conn,
+                  cohortsToCreate = cohortsToCreate,
+                  cdmDatabaseSchema = cdmDatabaseSchema,
+                  cohortDatabaseSchema = cohortDatabaseSchema,
+                  cohortTable = cohortTable,
+                  oracleTempSchema = NULL,
+                  # outputFolder = outputFolder, # should cohort counts end up in export? assuming so for now:
+                  outputFolder = exportFolder
+    )
+  }
+  print("ran createCohorts")
+
+  if (createCovariates) {
+    covariates <- createCovariates(connection = conn,
+                     cohorts = cohortsToCreate,
+                     covariateSettings = covariateSettings,
+                     cdmDatabaseSchema = cdmDatabaseSchema,
+                     cohortDatabaseSchema = cohortDatabaseSchema,
+                     cohortTable = cohortTable,
+                     oracleTempSchema = NULL,
+                     # outputFolder = outputFolder, # should cohort counts end up in export? assuming so for now:
+                     exportFolder = exportFolder,
+                     covarOutput = covarOutput
+    )
+
+    # print("ran createCovariates")
+    # if (return == "covariates") {
+    #   return(covariates)
+    # }
+  }
+
+  vernum <- readLines(pipe("grep '^Version' ./DESCRIPTION"))
+  fpath <- file.path(exportFolder, "version.txt")
+  write(vernum, fpath)
+
+
+  #consider removing this later
+  outputFile <- file(paste0(outputFolder, '/outputLog.txt'))
 	# OhdsiRTools::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
 
-  dbms <- connp$dbms
+	if (packageResults) {
+	  #OhdsiRTools::logInfo("Packaging results")
+	 packageResults(outputFolder = outputFolder)
+	}
 
-	conn <- DatabaseConnector::connect(connectionDetails)
-
-	sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "Male50plus.sql",
-	                                         # Male50plus requires target_cohort_id
-	                                         target_cohort_id = 1,
-	                                         packageName = packageName(),
-	                                         dbms,
-	                                         cdm_database_schema = connp$schema,
-	                                         vocabulary_database_schema = connp$vocab_schema,
-	                                         target_database_schema = connp$results_schema,
-	                                         target_cohort_table = cohortTable)
-
-	DatabaseConnector::executeSql(conn, sql)
-
-	sql <- SqlRender::render(
-	  'SELECT COUNT(*) FROM @target_database_schema.@target_cohort_table',
-	  #group by cohort_id
-		target_database_schema=connp$results_schema,
-	  target_cohort_table = cohortTable)
-
-	sql <- translate(sql, targetDialect = dbms)
-
-	cohort_cnt <- DatabaseConnector::querySql(conn, sql)
-
-	print(paste0(cohort_cnt, ' records in ', connp$results_schema, '.', cohortTable))
-
-
-
-  #create a a csv file into export folder (with the counts) (pick your design, e.g., one line per cohort
-
-	#custom age categories (bin thresholds) #forum to Martijn (vignete may not cover it)
-
-	####################### featureExtraction ################################
-
-	# new weirdness: createCovariateSettings with params below only results in one covar ()
-
-	covariateSettings <- createDefaultCovariateSettings()
-
-	covariateSettings <- createCovariateSettings(
-	  useDemographicsAge = TRUE
-	  , useDemographicsRace = TRUE
-	  , useDemographicsEthnicity = TRUE
-	  , useDemographicsIndexYear = TRUE
-	  ,useDemographicsAgeGroup = TRUE
-	  # useDemographicsIndexMonth = FALSE, useDemographicsPriorObservationTime = FALSE,
-	  # useDemographicsPostObservationTime = FALSE, useDemographicsTimeInCohort = FALSE,
-	  # useDemographicsIndexYearMonth = FALSE, useConditionOccurrenceAnyTimePrior = FALSE,
-	  # useConditionOccurrenceLongTerm = FALSE, useConditionOccurrenceMediumTerm = FALSE,
-	  # useConditionOccurrenceShortTerm = FALSE, useConditionOccurrencePrimaryInpatientAnyTimePrior = FALSE,
-	  # useConditionOccurrencePrimaryInpatientLongTerm = FALSE,
-	  # useConditionOccurrencePrimaryInpatientMediumTerm = FALSE,
-	  # useConditionOccurrencePrimaryInpatientShortTerm = FALSE,
-	  # useConditionEraAnyTimePrior = FALSE, useConditionEraLongTerm = FALSE,
-	  # useConditionEraMediumTerm = FALSE, useConditionEraShortTerm = FALSE,
-	  # useConditionEraOverlapping = FALSE, useConditionEraStartLongTerm = FALSE,
-	  # useConditionEraStartMediumTerm = FALSE, useConditionEraStartShortTerm = FALSE,
-	  , useConditionOccurrenceAnyTimePrior = TRUE
-	  , useDemographicsGender = TRUE
-	  , useCharlsonIndex = TRUE
-	  # , useChads2Vasc = F,  # this one is causing an error:
-	  #, useDcsi = FALSE
-	 )
-	settings2 <- convertPrespecSettingsToDetailedSettings(covariateSettings)
-
-
-	# dcd <- getDbDefaultCovariateData(conn,
-	#                           covariateSettings = covariateSettings,
-	#                           cdmDatabaseSchema = connp$schema,
-	#                           targetDatabaseSchema = connp$results_schema,
-	#                           cohortTable = paste0(connp$results_schema, '.', studyp$cohort_table))
-	#
-	# function (connection, oracleTempSchema = NULL, cdmDatabaseSchema,
-	#           cohortTable = "#cohort_person", cohortId = -1, cdmVersion = "5",
-	#           rowIdField = "subject_id", covariateSettings, targetDatabaseSchema,
-	#           targetCovariateTable, targetCovariateRefTable, targetAnalysisRefTable,
-	#           aggregated = FALSE)
-
-
-	# browser()
-	covariateData2 <- getDbCovariateData(
-	                                     connectionDetails = connectionDetails,
-	                                     # connection = conn,
-	                                     cdmDatabaseSchema = connp$schema,
-	                                     cohortDatabaseSchema = connp$results_schema,
-	                                     cohortTable = cohortTable,
-	                                     cohortId = 1, #target_cohort_id,
-	                                     #rowIdField = "subject_id", # sometimes uncommenting this is necessary, but not always
-	                                     # aggregated = TRUE,
-	                                     # covariateSettings = covariateSettings
-	                                     covariateSettings = settings2
-	                                     # createTable1 requires aggregated = TRUE
-	                                     # tidyCovariateData requires aggregated = FALSE
-	   # failing at getDbDefaultCovariateData
-	   # getDbDefaultCovariateData(conn, covariateSettings = covariateSettings, cdmDatabaseSchema = connp$schema, targetDatabaseSchema = connp$results_schema, cohortTable = "onek_results.HivDescriptive_cohort")
-	)
-	summary(covariateData2)
-
-  # # not working: (from http://ohdsi.github.io/FeatureExtraction/articles/UsingFeatureExtraction.html#removing-infrequent-covariates-normalizing-and-removing-redundancy)
-	# # (worked after setting aggregated = FALSE above)
-	# tcd <- tidyCovariateData(covariateData2, minFraction = 0.01, normalize = T, removeRedundancy = F)
-	#
-	atcd <- aggregateCovariates(covariateData2)
-	result <- createTable1(atcd)
-
-	result <- createTable1(covariateData2)
-
-	result
-
-
-	querySql(conn, 'SELECT *
-    FROM (
-    SELECT row_id, covariate_id, covariate_value FROM cov_1 UNION ALL
-    SELECT row_id, covariate_id, covariate_value FROM cov_2 UNION ALL
-    SELECT row_id, covariate_id, covariate_value FROM cov_3
-    ) all_covariates;')
-
-
-
-	DatabaseConnector::disconnect(conn)
-
+#   #create a a csv file into export folder (with the counts) (pick your design, e.g., one line per cohort
+#
+# 	#custom age categories (bin thresholds) #forum to Martijn (vignete may not cover it)
+#
+# 	####################### featureExtraction ################################
+#
+# 	# new weirdness: createCovariateSettings with params below only results in one covar ()
+#
+# 	covariateSettings <- createDefaultCovariateSettings()
+#
+# 	covariateSettings <- createCovariateSettings(
+# 	  useDemographicsAge = TRUE
+# 	  , useDemographicsRace = TRUE
+# 	  , useDemographicsEthnicity = TRUE
+# 	  , useDemographicsIndexYear = TRUE
+# 	  ,useDemographicsAgeGroup = TRUE
+# 	  # useDemographicsIndexMonth = FALSE, useDemographicsPriorObservationTime = FALSE,
+# 	  # useDemographicsPostObservationTime = FALSE, useDemographicsTimeInCohort = FALSE,
+# 	  # useDemographicsIndexYearMonth = FALSE, useConditionOccurrenceAnyTimePrior = FALSE,
+# 	  # useConditionOccurrenceLongTerm = FALSE, useConditionOccurrenceMediumTerm = FALSE,
+# 	  # useConditionOccurrenceShortTerm = FALSE, useConditionOccurrencePrimaryInpatientAnyTimePrior = FALSE,
+# 	  # useConditionOccurrencePrimaryInpatientLongTerm = FALSE,
+# 	  # useConditionOccurrencePrimaryInpatientMediumTerm = FALSE,
+# 	  # useConditionOccurrencePrimaryInpatientShortTerm = FALSE,
+# 	  # useConditionEraAnyTimePrior = FALSE, useConditionEraLongTerm = FALSE,
+# 	  # useConditionEraMediumTerm = FALSE, useConditionEraShortTerm = FALSE,
+# 	  # useConditionEraOverlapping = FALSE, useConditionEraStartLongTerm = FALSE,
+# 	  # useConditionEraStartMediumTerm = FALSE, useConditionEraStartShortTerm = FALSE,
+# 	  , useConditionOccurrenceAnyTimePrior = TRUE
+# 	  , useDemographicsGender = TRUE
+# 	  , useCharlsonIndex = TRUE
+# 	  # , useChads2Vasc = F,  # this one is causing an error:
+# 	  #, useDcsi = FALSE
+# 	 )
+# 	settings2 <- convertPrespecSettingsToDetailedSettings(covariateSettings)
+#
+#
+# 	# dcd <- getDbDefaultCovariateData(conn,
+# 	#                           covariateSettings = covariateSettings,
+# 	#                           cdmDatabaseSchema = connp$schema,
+# 	#                           targetDatabaseSchema = connp$results_schema,
+# 	#                           cohortTable = paste0(connp$results_schema, '.', studyp$cohort_table))
+# 	#
+# 	# function (connection, oracleTempSchema = NULL, cdmDatabaseSchema,
+# 	#           cohortTable = "#cohort_person", cohortId = -1, cdmVersion = "5",
+# 	#           rowIdField = "subject_id", covariateSettings, targetDatabaseSchema,
+# 	#           targetCovariateTable, targetCovariateRefTable, targetAnalysisRefTable,
+# 	#           aggregated = FALSE)
+#
+#
+# 	# browser()
+# 	covariateData2 <- getDbCovariateData(
+# 	                                     connectionDetails = connectionDetails,
+# 	                                     # connection = conn,
+# 	                                     cdmDatabaseSchema = connp$schema,
+# 	                                     cohortDatabaseSchema = connp$results_schema,
+# 	                                     cohortTable = cohortTable,
+# 	                                     cohortId = 1, #target_cohort_id,
+# 	                                     #rowIdField = "subject_id", # sometimes uncommenting this is necessary, but not always
+# 	                                     # aggregated = TRUE,
+# 	                                     # covariateSettings = covariateSettings
+# 	                                     covariateSettings = settings2
+# 	                                     # createTable1 requires aggregated = TRUE
+# 	                                     # tidyCovariateData requires aggregated = FALSE
+# 	   # failing at getDbDefaultCovariateData
+# 	   # getDbDefaultCovariateData(conn, covariateSettings = covariateSettings, cdmDatabaseSchema = connp$schema, targetDatabaseSchema = connp$results_schema, cohortTable = "onek_results.HivDescriptive_cohort")
+# 	)
+# 	summary(covariateData2)
+#
+#   # # not working: (from http://ohdsi.github.io/FeatureExtraction/articles/UsingFeatureExtraction.html#removing-infrequent-covariates-normalizing-and-removing-redundancy)
+# 	# # (worked after setting aggregated = FALSE above)
+# 	# tcd <- tidyCovariateData(covariateData2, minFraction = 0.01, normalize = T, removeRedundancy = F)
+# 	#
+# 	atcd <- aggregateCovariates(covariateData2)
+# 	result <- createTable1(atcd)
+#
+# 	result <- createTable1(covariateData2)
+#
+# 	result
+#
+#
+# 	querySql(conn, 'SELECT *
+#     FROM (
+#     SELECT row_id, covariate_id, covariate_value FROM cov_1 UNION ALL
+#     SELECT row_id, covariate_id, covariate_value FROM cov_2 UNION ALL
+#     SELECT row_id, covariate_id, covariate_value FROM cov_3
+#     ) all_covariates;')
+#
 	invisible(NULL)
-	return(result)
+  # return(result) # commented out code above creates results. returning nothing for now
+	return()
 }
   # cut from execute function:
   # if (createCohorts) {
