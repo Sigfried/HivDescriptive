@@ -44,7 +44,7 @@ createCovariates <- function(connection,
     covariates <- getDbCovariateData(connection = connection,
                                      cdmDatabaseSchema = cdmDatabaseSchema,
                                      cohortDatabaseSchema = cohortDatabaseSchema,
-                                     cohortTable = "hiv_cohort_table",
+                                     cohortTable = cohortTable,
                                      cohortId = cohorts$cohortId[i],
                                      covariateSettings = covariateSettingsList,
                                      aggregated = FALSE
