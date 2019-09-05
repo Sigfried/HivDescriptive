@@ -27,17 +27,20 @@ run <- function() {
   # can't run that shell script in Windows. rewriting in R
   # luckily pipe still works
 
-  vertext <- paste0(
-    readLines(pipe('grep Version DESCRIPTION')),
-    '',
-    'Current commit',
-    readLines(pipe('git rev-parse --verify HEAD')),
-    '',
-    'Current git status',
-    readLines(pipe('git status')),
-    collapse = '\n'
-  )
-  write(vertext, "./version.txt")
+  ver <- readLines(pipe('grep Version DESCRIPTION'))  %>% paste0(collapse = '\n')
+  gitcommit <- readLines(pipe('git rev-parse --verify HEAD')) %>% paste0(collapse = '\n')
+  gitstatus <- readLines(pipe('git status')) %>% paste0(collapse = '\n')
+
+  vertext <- glue::glue("
+{ver}
+
+Current commit {gitcommit}
+
+Current git status
+{gitstatus}
+")
+
+    write(vertext, "./version.txt")
 
   #setwd('./HivDescriptive/')
   source('~/secret/conn.R')
