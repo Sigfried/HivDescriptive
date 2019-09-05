@@ -70,7 +70,7 @@ execute <- function(connectionDetails,
 	if (!file.exists(outputFolder))
 		dir.create(outputFolder, recursive = TRUE)
 
-  #create export folder
+  #create export folder INSIDE outputFolder
   exportFolder <- file.path(outputFolder, "export")
   if (!file.exists(exportFolder))
     dir.create(exportFolder)

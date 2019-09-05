@@ -1,23 +1,19 @@
-Version: 7.0
+Version: 7.0.1
 
-Current commit
-e122bba13c8523633d31d885a627ee84dad0a99e
+Current commit 540da769cd40eb0e21f4c2ad33db5c4919a4adf1
 
 Current git status
-# On branch custom-covar
-# Your branch is ahead of 'origin/custom-covar' by 1 commit.
-#   (use "git push" to publish your local commits)
-#
-# Changes to be committed:
-#   (use "git reset HEAD <file>..." to unstage)
-#
-#	new file:   central_processing/CodeToRun.R
-#
-# Changes not staged for commit:
-#   (use "git add <file>..." to update what will be committed)
-#   (use "git checkout -- <file>..." to discard changes in working directory)
-#
-#	modified:   R/CustomSqlCohortAnalysis.R
-#	modified:   R/main.R
-#	modified:   version.txt
-#
+On branch custom-covar
+Your branch is ahead of 'origin/custom-covar' by 1 commit.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   HivDescriptive.Rproj
+	modified:   R/main.R
+	modified:   extras/CodeToRun.R
+	modified:   version.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")

@@ -23,7 +23,20 @@ library(HivDescriptive)
 
 run <- function() {
 
-  vertext <- readLines(pipe("./current_version_commit_and_state.sh"))
+  # vertext <- readLines(pipe("./current_version_commit_and_state.sh"))
+  # can't run that shell script in Windows. rewriting in R
+  # luckily pipe still works
+
+  vertext <- paste0(
+    readLines(pipe('grep Version DESCRIPTION')),
+    '',
+    'Current commit',
+    readLines(pipe('git rev-parse --verify HEAD')),
+    '',
+    'Current git status',
+    readLines(pipe('git status')),
+    collapse = '\n'
+  )
   write(vertext, "./version.txt")
 
   #setwd('./HivDescriptive/')
