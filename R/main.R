@@ -119,7 +119,7 @@ execute <- function(connectionDetails,
 
   results <- pmap_dfr(cohortsToCreate, # technique from https://stackoverflow.com/questions/46899441/row-wise-iteration-like-apply-with-purrr
                       function(cohort_id, cohort_name, atlas_id)
-                        customSqlCohortAnalysis(
+                        visits(
                           cohort_id,
                           cohort_name,
                           connection = conn,
@@ -131,7 +131,7 @@ execute <- function(connectionDetails,
                           exportFolder = exportFolder))
   # %>% filter(!is.na(avg_visits))
 
-  fpath <- file.path(exportFolder, "mean_visits_per_person_by_cohort.csv")
+  fpath <- file.path(exportFolder, "visit_days_relative_to_cohort_start.csv")
   write.csv(results, fpath, row.names = FALSE)
 
 

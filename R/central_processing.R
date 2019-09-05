@@ -7,7 +7,6 @@
 #   "onek.zip", "onek", "Site 5678"
 # )
 
-
 unzip_and_compare <- function(zipdir = zipdir,
                               unzipdir = unzipdir,
                               site_info = site_info,
@@ -51,10 +50,9 @@ unzip_and_compare <- function(zipdir = zipdir,
   cohorts_by_site <- cnts %>% group_by(site) %>% do(cohorts = paste0(.data$cohort, collapse = ', ')) %>% mutate(cohorts = unlist(cohorts))
 
   cnts <- cnts %>% select(site, cohort, count)
-  write_csv(cnts, file.path(outputdir, "CohortCounts.csv"))
 
-  print("so far so good")
-  return()
+  all_results = list(CohortCounts = cnts)
+  return(all_results)
 }
 
 unzip_site_files <- function(fname, sitename_in_report, zipdir, unzipdir) {

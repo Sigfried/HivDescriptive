@@ -39,7 +39,7 @@ site_info <- tibble::tribble(
   )
 
 
-cp_compare_results <- unzip_and_compare(
+results <- HivDescriptive::unzip_and_compare(
   zipdir = zipdir,
   unzipdir = unzipdir,
   site_info = site_info,
@@ -47,3 +47,10 @@ cp_compare_results <- unzip_and_compare(
   # , ignore_extra_zipfiles = FALSE,
   # , ignore_missing_zipfiles = FALSE
   )
+
+imap(results, function(res, name) {
+  write_csv(res, file.path(outputdir, paste0(name,".long.csv")))
+  write_csv(res %>% spread(site, count), file.path(outputdir, paste0(name,".by_site.csv")))
+  write_csv(res %>% spread(cohort, count), file.path(outputdir, paste0(name,".by_cohort.csv")))
+})
+
