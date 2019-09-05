@@ -1,17 +1,24 @@
 library(SqlRender)
-# devtools::install_git('https://github.com/OHDSI/FeatureExtraction', ref = 'develop')
-# library(FeatureExtraction)
 
+# needed this for windows install
+# Sys.setenv(JAVA_HOME = "C:/Program Files/Java/jre1.8.0_221")
+# devtools::install_git('https://github.com/OHDSI/DatabaseConnector', ref = 'master', INSTALL_opts=c("--no-multiarch"))
+# devtools::install_git('https://github.com/OHDSI/FeatureExtraction', ref = 'master', INSTALL_opts=c("--no-multiarch")) # needed this to load develop branch, but master is updated now
+# install.packages("xml2")
+# install.packages("digest")
+# devtools::install_git('https://github.com/OHDSI/ohdsiSharing', ref = 'master', INSTALL_opts=c("--no-multiarch"))
+
+# needed the following when having to add some debugging code to FeatureExtraction
+# cloned from git, then:
 # devtools::install_local("../FeatureExtraction", source = TRUE, ref = "develop", force = TRUE)
+
 library(FeatureExtraction)
 
 library(tidyverse)
 
-# remove.packages('HivDescriptive')
-# setwd("/export/home/goldss/projects/")
-# library(devtools)
-# install_local('HivDescriptive')
+# build this package now
 library(HivDescriptive)
+
 
 
 run <- function() {
@@ -21,11 +28,17 @@ run <- function() {
 
   #setwd('./HivDescriptive/')
   source('~/secret/conn.R')
+  dbms <- "postgresql"
+  user <- Sys.getenv('PGUSER')
+  pw <- Sys.getenv('PGPASSWORD')
+  server <- paste0(Sys.getenv('PGHOST'), '/', Sys.getenv('PGDATABASE'))
+  port <- Sys.getenv('PGPORT')
+  cdm_database_schema <- cdmDatabaseSchema <- "onek"
+  resultsDatabaseSchema <- cohortDatabaseSchema <- "onek_results"
+
 
   min_cell_count = 5 # SHOULD BE 11!! 5 for now for onek CDM@
   top_n_meds = 10
-  cdm_database_schema <- cdmDatabaseSchema <- "onek"
-  resultsDatabaseSchema <- cohortDatabaseSchema <- "onek_results"
 
   # cdm_database_schema <- cdmDatabaseSchema <- "eunomia"
   # resultsDatabaseSchema <- cohortDatabaseSchema <- "eunomia_results"
@@ -40,7 +53,10 @@ run <- function() {
   if (TRUE) {  #
 
   }
-  outputFolder <- paste(outputFolder, cdm_database_schema, Sys.time()) %>% stringr::str_replace_all(" ","_")
+  outputFolder <-
+    paste(outputFolder, cdm_database_schema, Sys.time()) %>%
+    stringr::str_replace_all(" ","_") %>%
+    stringr::str_replace_all(":","-") # windows paths can't include :
   unlink(outputFolder, recursive = TRUE)
 
   connectionDetails <- createConnectionDetails(dbms = dbms,
