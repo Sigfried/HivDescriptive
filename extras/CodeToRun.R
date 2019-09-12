@@ -1,5 +1,3 @@
-library(SqlRender)
-
 # needed this for windows install
 # Sys.setenv(JAVA_HOME = "C:/Program Files/Java/jre1.8.0_221")
 # devtools::install_git('https://github.com/OHDSI/DatabaseConnector', ref = 'master', INSTALL_opts=c("--no-multiarch"))
@@ -12,6 +10,8 @@ library(SqlRender)
 # cloned from git, then:
 # devtools::install_local("../FeatureExtraction", source = TRUE, ref = "develop", force = TRUE)
 
+library(OhdsiSharing)
+library(SqlRender)
 library(FeatureExtraction)
 
 library(tidyverse)
@@ -40,17 +40,17 @@ Current git status
 {gitstatus}
 ")
 
-    write(vertext, "./version.txt")
+  write(vertext, "./version.txt")
 
   #setwd('./HivDescriptive/')
-  # source('~/secret/conn.R')
-  # dbms <- "postgresql"
+  source('~/secret/conn.R')
+  dbms <- "postgresql"
   # user <- Sys.getenv('PGUSER')
   # pw <- Sys.getenv('PGPASSWORD')
   # server <- paste0(Sys.getenv('PGHOST'), '/', Sys.getenv('PGDATABASE'))
   # port <- Sys.getenv('PGPORT')
-  # cdm_database_schema <- cdmDatabaseSchema <- "onek"
-  # resultsDatabaseSchema <- cohortDatabaseSchema <- "onek_results"
+  cdm_database_schema <- cdmDatabaseSchema <- "onek"
+  resultsDatabaseSchema <- cohortDatabaseSchema <- "onek_results"
 
 
   min_cell_count = 5 # SHOULD BE 11!! 5 for now for onek CDM@
