@@ -1,1 +1,16 @@
-Version: 4.1
+Version: 7.0.1
+
+Current commit afbb91475585913dd631c8d7b7ee470d4a226623
+
+Current git status
+# On branch custom-covar
+# Changes not staged for commit:
+#   (use "git add <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#	modified:   R/CustomSqlCohortAnalysis.R
+#	modified:   R/main.R
+#	modified:   version.txt
+#
+no changes added to commit (use "git add" and/or "git commit -a")
+
