@@ -131,8 +131,26 @@ execute <- function(connectionDetails,
                           exportFolder = exportFolder))
   # %>% filter(!is.na(avg_visits))
 
-  fpath <- file.path(exportFolder, "visit_days_relative_to_cohort_start.csv")
-  write.csv(results, fpath, row.names = FALSE)
+  report_cols <- c('visits','pre_index_visits','post_index_visits','obsdays','pre_index_obsdays','post_index_obsdays')
+  summarize_col <- function(tbl, col) summary(tbl[[col]])
+  summarize_groups <- function(grp) {
+    col_summary <- report_cols %>% map(~ summarize_col(grp, .x))
+    bind_cols(tibble(col=report_cols), col_summary %>% map(bind_rows) %>% bind_rows() )
+  }
+  summaries <-
+    results %>%
+    group_by(cohort_name, cohort_id) %>%
+    do(stats = summarize_groups(.data)) %>%
+    pmap(
+      function(cohort_name, cohort_id, stats)
+        stats %>%
+          mutate(cohort_name=cohort_name, cohort_id=cohort_id) %>%
+          select(cohort_name, cohort_id, everything())
+      ) %>%
+      bind_rows()
+
+  fpath <- file.path(exportFolder, "visits_and_obs_summary.csv")
+  write.csv(summaries, fpath, row.names = FALSE)
 
 
 

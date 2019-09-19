@@ -1,6 +1,6 @@
 Version: 7.0.1
 
-Current commit 72d4a67f07cfc582820676f306890839920b38e9
+Current commit afbb91475585913dd631c8d7b7ee470d4a226623
 
 Current git status
 # On branch custom-covar
@@ -9,7 +9,7 @@ Current git status
 #   (use "git checkout -- <file>..." to discard changes in working directory)
 #
 #	modified:   R/CustomSqlCohortAnalysis.R
-#	modified:   extras/CodeToRun.R
+#	modified:   R/main.R
 #	modified:   version.txt
 #
 no changes added to commit (use "git add" and/or "git commit -a")

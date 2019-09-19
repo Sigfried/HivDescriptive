@@ -39,27 +39,33 @@ visits <- function( cohort_id,
   )
   sql <- SqlRender::translate(sql, attr(connection, "dbms"))
   res <- querySql(connection, sql)
+  if (nrow(res) == 0)
+    return(NULL)
 
-  vars <-
+  names(res) <- tolower(names(res))
+  names(res)[1] <- 'row_id'
+  daylists <-
     res %>%
     group_by(row_id) %>%
     do(days = .data$days) %>%
-    select(days) %>%
+    select(days)
+
+  stats <- daylists %>% mutate(s = list(summary(days))) %>% pull(s) %>% map(bind_rows) %>% bind_rows()
+
+  vars <- daylists %>%
     mutate(visits = length(days),
-           previsits = sum(days < 0),
-           postvisits = sum(days >=0),
            obsdays = max(days) - min(days),
-           predays = abs(min(days)),
-           postdays = max(days)
-    )
-  return(list())
-  names(res) <- tolower(names(res))
-  names(res)[1] <- 'row_id'
-  res %>% group_by(row_id) %>% rowwise() %>% transmute(days = list(days)) %>% ungroup() %>% select(days=unlist(days))
 
+           pre_index_visits = sum(days < 0),
+           pre_index_obsdays = abs(min(days)),
 
-  t <- as.tibble(res) %>% add_column(cohort_id=cohort_id, cohort_name=cohort_name, .before = TRUE)
-  names(t) <- tolower(names(t))
+           post_index_visits = sum(days >=0),
+           post_index_obsdays = max(days)
+    ) %>%
+    bind_cols(stats) %>%
+    select(-days)
+  t <- as.tibble(vars) %>% add_column(cohort_id=cohort_id, cohort_name=cohort_name, .before = TRUE)
+  return(t)
 
   # the following query would be nice for showing various distributions, but it includes patient-level data, so not using it
   # sql = "
