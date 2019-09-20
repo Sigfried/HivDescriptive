@@ -23,7 +23,7 @@
 
 # cohorts loading from public ATLAS server:
 
-# cohortId,atlasId,name
+# cohort_id,atlas_id,cohort_name
 # 1769961,1769961,Male50plus
 # 1769440,1769440,HIV_Patient
 # 1770612,1770612,HIV_patient_by_LOINC_codes
@@ -42,13 +42,35 @@
 # 1770614,1770614,HIV_by_1_SNOMED_Dx    # SG, 6/12/2019: this isn't breaking things anymore. not sure why
 
 # Insert cohort definitions from ATLAS into package -----------------------
-OhdsiRTools::insertCohortDefinitionSetInPackage(fileName = "CohortsToCreate.csv",
-                                                baseUrl = "http://18.213.176.21:80/WebAPI",
-                                                insertTableSql = TRUE,
-                                                insertCohortCreationR = FALSE, #TRUE,
-                                                generateStats = FALSE,
-                                                packageName = 'HivDescriptive'
-                                                )
+
+library(ROhdsiWebApi)
+
+for.debugging <- function() {
+  browser()
+
+  ROhdsiWebApi::insertCohortDefinitionInPackage(
+    definitionId = 1771506,
+    name = "eunomia_onek",
+    baseUrl = "http://18.213.176.21:80/WebAPI",# "http://18.213.176.21:80/WebAPI"
+    generateStats = FALSE
+  )
+
+  OhdsiRTools::insertCohortDefinitionInPackage(
+    definitionId = 1771506,
+    name = "eunomia_onek",
+    baseUrl = "http://18.213.176.21:80/WebAPI",# "http://18.213.176.21:80/WebAPI"
+    generateStats = FALSE
+  )
+  OhdsiRTools::insertCohortDefinitionSetInPackage(fileName = "CohortsToCreate.csv",
+                                                  baseUrl = "http://18.213.176.21:80/WebAPI",
+                                                  insertTableSql = TRUE,
+                                                  insertCohortCreationR = FALSE, #TRUE,
+                                                  generateStats = FALSE,
+                                                  packageName = 'HivDescriptive'
+  )
+}
+for.debugging()
+
 # Error in readChar(fileName, file.info(fileName)$size) :
 #   invalid 'nchars' argument
 # In addition: Warning message:
@@ -58,12 +80,6 @@ OhdsiRTools::insertCohortDefinitionSetInPackage(fileName = "CohortsToCreate.csv"
 # command above produces error but seems to work. it creates the right files. To do them one by
 #   one without error messages, use commands below
 
-# OhdsiRTools::insertCohortDefinitionInPackage(
-#   definitionId = 1769961,
-#   name = "Male50plus",
-#   baseUrl = Sys.getenv("WebAPIBaseUrl"),# "http://18.213.176.21:80/WebAPI"
-#   generateStats = FALSE
-# )
 #
 # OhdsiRTools::insertCohortDefinitionInPackage(
 #   definitionId = 1769440,

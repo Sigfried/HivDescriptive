@@ -66,8 +66,8 @@ createCohorts <- function(connection,
 
   # Instantiate cohorts:
   for (i in 1:nrow(cohortsToCreate)) {
-    writeLines(paste("Creating cohort:", cohortsToCreate$name[i]))
-    sql <- SqlRender::loadRenderTranslateSql(sqlFilename = paste0(cohortsToCreate$name[i], ".sql"),
+    writeLines(paste("Creating cohort:", cohortsToCreate$cohort_name[i]))
+    sql <- SqlRender::loadRenderTranslateSql(sqlFilename = paste0(cohortsToCreate$cohort_name[i], ".sql"),
                                              packageName = "HivDescriptive",
                                              dbms = attr(connection, "dbms"),
                                              oracleTempSchema = oracleTempSchema,
@@ -76,21 +76,49 @@ createCohorts <- function(connection,
 
                                              target_database_schema = cohortDatabaseSchema,
                                              target_cohort_table = cohortTable,
-                                             target_cohort_id = cohortsToCreate$cohortId[i])
+                                             target_cohort_id = cohortsToCreate$cohort_id[i])
     DatabaseConnector::executeSql(connection, sql)
   }
 
-  # Fetch cohort counts:
-  sql <- "SELECT cohort_definition_id, COUNT(*) AS count FROM @cohort_database_schema.@cohort_table GROUP BY cohort_definition_id"
-  sql <- SqlRender::render(sql,
-                              cohort_database_schema = cohortDatabaseSchema,
-                              cohort_table = cohortTable)
-  sql <- SqlRender::translate(sql, targetDialect = attr(connection, "dbms"))
-  counts <- DatabaseConnector::querySql(connection, sql)
-  names(counts) <- SqlRender::snakeCaseToCamelCase(names(counts))
-  counts <- merge(counts, data.frame(cohortDefinitionId = cohortsToCreate$cohortId,
-                                     cohortName  = cohortsToCreate$name))
+
+  counts <- get_cohort_counts(cohortDatabaseSchema, cohortTable, connection)
+  counts <- fake_cohorts_if_empty(counts, cohortsToCreate, cohortDatabaseSchema, cohortTable, connection)
+
+  counts <- merge(counts, data.frame(cohortDefinitionId = cohortsToCreate$cohort_id,
+                                     cohortName  = cohortsToCreate$cohort_name))
   write.csv(counts, file.path(outputFolder, "CohortCounts.csv"), row.names = FALSE)
   writeLines(paste0("Wrote cohort counts to ", outputFolder,"/CohortCounts.csv"))
 }
 
+get_cohort_counts <- function(cohortDatabaseSchema, cohortTable, connection) {
+  sql <- "SELECT cohort_definition_id, COUNT(*) AS count FROM @cohort_database_schema.@cohort_table GROUP BY cohort_definition_id"
+  sql <- SqlRender::render(sql,
+                           cohort_database_schema = cohortDatabaseSchema,
+                           cohort_table = cohortTable)
+  sql <- SqlRender::translate(sql, targetDialect = attr(connection, "dbms"))
+  counts <- DatabaseConnector::querySql(connection, sql)
+  names(counts) <- SqlRender::snakeCaseToCamelCase(names(counts))
+  return(counts)
+}
+
+fake_cohorts_if_empty <- function(counts, cohortsToCreate, cohortDatabaseSchema, cohortTable, connection) {
+  # browser()
+  empties <- setdiff(cohortsToCreate$cohort_id, counts$cohortDefinitionId)
+  sql <- "
+          insert into eunomia_results.hiv_cohort_table (
+            select @cohort_id, p.person_id, min(o.observation_date) start_date, max(o.observation_date) end_date
+            from eunomia.person p
+            tablesample system(10)
+            join eunomia.observation o on p.person_id = o.person_id
+            group by 1,2
+            limit 100)"
+  stuff <- empties %>% map(function(cohort_id) {
+    sql <- SqlRender::render(sql,
+                             cohort_database_schema = cohortDatabaseSchema,
+                             cohort_table = cohortTable,
+                             cohort_id = cohort_id)
+    sql <- SqlRender::translate(sql, targetDialect = attr(connection, "dbms"))
+    DatabaseConnector::executeSql(connection, sql)
+  })
+  return(get_cohort_counts(cohortDatabaseSchema, cohortTable, connection))
+}
